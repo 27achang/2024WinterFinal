@@ -28,10 +28,10 @@ public class Simulation {
 
         // Collect user details
         System.out.println("""
-                ---------------------------
-                  Welcome to the Clue 2.0!
-                ---------------------------
-                """);
+            -----------------------
+              Welcome to Clue 2.0!
+            -----------------------
+            """);
     }
 
     private void run(){
