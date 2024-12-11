@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Simulation {
@@ -28,14 +29,43 @@ public class Simulation {
 
         // Collect user details
         System.out.println("""
-            -----------------------
-              Welcome to Clue 2.0!
-            -----------------------
-            """);
+        
+        -----------------------
+          Welcome to Clue 2.0!
+        -----------------------""");
+
+        System.out.println("Please select from the options below:");
+            ANSI_WHITE_BACKGROUND + ANSI_BLACK + "about" + ANSI_RESET + " - Learn more about Clue 2.0\n" +
+            ANSI_WHITE_BACKGROUND + ANSI_BLACK + "begin" + ANSI_RESET + " - Begin the game"
     }
 
+    /**
+     * Runs the text adventure, prompting the user for input on each turn
+     */
     private void run() {
-        // Implementation not shown
+        // Not yet implemented
+    }
+
+    // Game Utility Methods
+
+    /**
+     * Prompts the user for input with a choice from the given commands and with rolling printing if {@code rolling} is true
+     * 
+     * @param rolling whether the print to System output should be rolling
+     * @param commands the commands to list and accept as valid input
+     * @return the command selected by the user
+     * @throws InterruptedException
+     */
+    public String promptInput(boolean rolling, Command... commands) throws InterruptedException {
+        String answer;
+        do{
+            for(Command command : commands) {
+                if(rolling) rollingPrintln(ANSI_WHITE_BACKGROUND + ANSI_BLACK + command.getName() + ANSI_RESET + command.getDescription());
+                else System.out.println(ANSI_WHITE_BACKGROUND + ANSI_BLACK + command.getName() + ANSI_RESET + command.getDescription());
+            }
+            answer = input.nextLine();
+        }while(!Arrays.stream(commands).anyMatch((a) -> a.matches(answer)));
+        return ((Command)(Arrays.stream(commands).filter((a) -> a.matches(answer)).toArray()[0])).getName();
     }
 
     public static void rollingPrint(Object obj) throws InterruptedException {
@@ -56,6 +86,6 @@ public class Simulation {
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Hello, World!");
+        new Simulation();
     }
 }
