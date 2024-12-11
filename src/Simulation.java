@@ -34,8 +34,25 @@ public class Simulation {
             """);
     }
 
-    private void run(){
+    private void run() {
         // Implementation not shown
+    }
+
+    public static void rollingPrint(Object obj) throws InterruptedException {
+        String output = obj.toString();
+        for(int i = 0; i < output.length() - 1; i++) {
+            System.out.print(output.charAt(i));
+            Thread.sleep(15);
+        }
+        System.out.print(output.charAt(output.length() - 1));
+    }
+
+    public static void rollingPrintln(Object obj) throws InterruptedException {
+        String output = obj.toString();
+        for(int i = 0; i < output.length() - 1; i++) {
+            System.out.print(output.charAt(i));
+        }
+        System.out.println(output.charAt(output.length() - 1));
     }
 
     public static void main(String[] args) throws Exception {
