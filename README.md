@@ -1,18 +1,12 @@
-## Getting Started
+# 2024 AP Computer Science A Winter Final Exam
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+> [!note]
+> To work as intended, this game **requires** a console that **supports ANSI escape codes**, which provide coloring and console clearing during gameplay.
 
-## Folder Structure
+This project attempts to recreate the classic mystery game ***Clue***, adding more modern features and items. This project was completed in its entirety by Alexander Chang. Unathorized reproduction of this project is prohibited by law.
 
-The workspace contains two folders by default, where:
-
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+<div align="center">
+<hr width=10%>
+© 2024 by Alexander Chang<br>
+All rights reserved
+</div>
