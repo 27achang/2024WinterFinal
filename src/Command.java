@@ -1,9 +1,12 @@
 import java.util.Arrays;
 
-public class Command {
-    private String name;
+public enum Command {
+    ABOUT("about", "Learn more about Clue 2.0"),
+    BEGIN("begin","Start the game");
+
+    private final String name;
     private String[] aliases = new String[0];
-    private String description;
+    private final String description;
 
     Command(String name, String description) {
         this.name = name;

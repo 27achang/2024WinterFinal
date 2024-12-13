@@ -35,8 +35,8 @@ public class Simulation {
 
         System.out.println("Please select from the options below:");
         String command = promptInput(true,
-            new Command("about","Learn more about Clue 2.0"),
-            new Command("begin","Start the game")
+            Command.ABOUT,
+            Command.BEGIN
         );
         System.out.println(command);
     }
