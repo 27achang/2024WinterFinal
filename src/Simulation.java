@@ -1,5 +1,4 @@
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.*;
 
 public class Simulation {
     public static final String ANSI_RESET = "\u001B[0m";
@@ -35,8 +34,11 @@ public class Simulation {
         -----------------------""");
 
         System.out.println("Please select from the options below:");
-            ANSI_WHITE_BACKGROUND + ANSI_BLACK + "about" + ANSI_RESET + " - Learn more about Clue 2.0\n" +
-            ANSI_WHITE_BACKGROUND + ANSI_BLACK + "begin" + ANSI_RESET + " - Begin the game"
+        String command = promptInput(true,
+            new Command("about","Learn more about Clue 2.0"),
+            new Command("begin","Start the game")
+        );
+        System.out.println(command);
     }
 
     /**
@@ -56,16 +58,34 @@ public class Simulation {
      * @return the command selected by the user
      * @throws InterruptedException
      */
-    public String promptInput(boolean rolling, Command... commands) throws InterruptedException {
+    public String promptInput(boolean rolling, Command... commands) {
         String answer;
-        do{
+        ArrayList<String> acceptedCommands = new ArrayList<>();
+        do {
             for(Command command : commands) {
-                if(rolling) rollingPrintln(ANSI_WHITE_BACKGROUND + ANSI_BLACK + command.getName() + ANSI_RESET + command.getDescription());
-                else System.out.println(ANSI_WHITE_BACKGROUND + ANSI_BLACK + command.getName() + ANSI_RESET + command.getDescription());
+                if(rolling){
+                    try {
+                        rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
+                    } catch(InterruptedException e) {
+                        System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
+                    }
+                } else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
+                acceptedCommands.add(command.getName());
+                if(command.containsAliases()) Arrays.stream(command.getAliases()).forEach((alias) -> acceptedCommands.add(alias));
             }
+            System.out.print("> ");
             answer = input.nextLine();
-        }while(!Arrays.stream(commands).anyMatch((a) -> a.matches(answer)));
-        return ((Command)(Arrays.stream(commands).filter((a) -> a.matches(answer)).toArray()[0])).getName();
+            //!Arrays.stream(commands).anyMatch((a) -> a.matches(answer))
+        } while(!acceptedCommands.contains(answer));
+        final String finalAnswer = answer;
+        return ((Command)(Arrays.stream(commands).filter((a) -> a.matches(finalAnswer)).toArray()[0])).getName();
+    }
+
+    public boolean isInvalidCommand(String givenCommand, Command[] commands) {
+        for(Command command : commands){
+            if(command.matches(givenCommand)) return true;
+        }
+        return false;
     }
 
     public static void rollingPrint(Object obj) throws InterruptedException {
