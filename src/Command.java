@@ -24,10 +24,10 @@ public class Command {
     }
 
     String getDescription() {
-        return name;
+        return description;
     }
 
-    String getAliases() {
-        return name;
+    String[] getAliases() {
+        return aliases;
     }
 }
