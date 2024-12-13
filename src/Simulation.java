@@ -1,6 +1,13 @@
 import java.util.*;
 
+/**
+ * The Simulation class contains the core mechanics of the game including turn actions and prompting for input
+ * 
+ * @author Alexander Chang
+ * @version 0.14, 12/13/2024
+ */
 public class Simulation {
+    // ANSI COLOR CODES
     public static final String ANSI_RESET = "\u001B[0m";
     
     public static final String ANSI_BLACK = "\u001B[30m";
@@ -26,18 +33,31 @@ public class Simulation {
     Simulation() {
         input = new Scanner(System.in);
 
-        // Collect user details
+        // Welcome the user
         System.out.println("""
         
         -----------------------
           Welcome to Clue 2.0!
         -----------------------""");
 
-        String command = promptInput("Please select from the options below:", true,
+        // Prompt for input
+        Command command = promptInput("Please select from the options below:", true,
             Command.ABOUT,
             Command.BEGIN
         );
-        System.out.println(command);
+        // Process input and complete the requested task
+        switch (command) {
+            case Command.ABOUT -> about();
+            case Command.BEGIN -> run();
+            default -> throw new IllegalStateException("Invalid command: " + command);
+        }
+    }
+
+    /**
+     * Opens the about screen, providing information about Clue 2.0
+     */
+    private void about() {
+        // Not yet implemented
     }
 
     /**
@@ -57,21 +77,32 @@ public class Simulation {
      * @param commands the commands to list and accept as valid input
      * @return the command selected by the user
      */
-    public String promptInput(String message, boolean rolling, Command... commands) {
+    public Command promptInput(String message, boolean rolling, Command... commands) {
         String answer;
         ArrayList<String> acceptedCommands = new ArrayList<>();
+
+        // Print the user prompt
         if(rolling) rollingPrintln(message);
         else System.out.println(message);
+
+        // Print the command options and update the list of accepted commands (including aliases)
+        // This list will be used to validate the input
         for(Command command : commands) {
             if(rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
             else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
             acceptedCommands.add(command.getName());
             if(command.containsAliases()) Arrays.stream(command.getAliases()).forEach((alias) -> acceptedCommands.add(alias));
         }
+        
+        // Allow the user to provide input
         System.out.print("> ");
         answer = input.nextLine();
+
+        // If the input is not a recognized command or alias, clear the console and prompt the user again.
         while (!acceptedCommands.contains(answer)) {
-            System.out.print("\033[H\033[2J");
+            System.out.print("\033[H\033[2J"); // Clear console
+
+            // Print the user prompt
             if(rolling){
                 rollingPrintln("You can't do that right now.");
                 rollingPrintln(message);
@@ -79,17 +110,19 @@ public class Simulation {
                 System.out.println("You can't do that right now.");
                 System.out.println(message);
             }
+
+            // Print the command options and update the list of accepted commands (including aliases)
             for(Command command : commands) {
                 if(rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
                 else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
-                acceptedCommands.add(command.getName());
-                if(command.containsAliases()) Arrays.stream(command.getAliases()).forEach((alias) -> acceptedCommands.add(alias));
             }
+        
+            // Allow the user to provide input
             System.out.print("> ");
             answer = input.nextLine();
         }
         final String finalAnswer = answer;
-        return ((Command)(Arrays.stream(commands).filter((a) -> a.matches(finalAnswer)).toArray()[0])).getName();
+        return ((Command)(Arrays.stream(commands).filter((a) -> a.matches(finalAnswer)).toArray()[0]));
     }
 
     public boolean isInvalidCommand(String givenCommand, Command[] commands) {

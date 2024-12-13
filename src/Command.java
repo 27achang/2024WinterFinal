@@ -1,5 +1,12 @@
 import java.util.Arrays;
 
+/**
+ * The Command enum type contains all accepted user commands and their aliases.
+ * The enum type also contains simple processing functions for game commands
+ * 
+ * @author Alexander Chang
+ * @version 0.14, 12/13/2024
+ */
 public enum Command {
     ABOUT("about", "Learn more about Clue 2.0"),
     BEGIN("begin","Start the game");
@@ -41,5 +48,10 @@ public enum Command {
 
     String[] getAliases() {
         return aliases;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
