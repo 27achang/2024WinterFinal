@@ -33,31 +33,53 @@ public class Simulation {
     Simulation() {
         input = new Scanner(System.in);
 
+        // Clear console
+        System.out.print("\033[H\033[2J");
+
         // Welcome the user
         System.out.println("""
-        
         -----------------------
           Welcome to Clue 2.0!
         -----------------------""");
 
-        // Prompt for input
-        Command command = promptInput("Please select from the options below:", true,
-            Command.ABOUT,
-            Command.BEGIN
-        );
-        // Process input and complete the requested task
-        switch (command) {
-            case Command.ABOUT -> about();
-            case Command.BEGIN -> run();
-            default -> throw new IllegalStateException("Invalid command: " + command);
-        }
+        Command command;
+        do {
+            // Prompt for input
+            command = promptInput("Please select from the options below:", true,
+                Command.ABOUT,
+                Command.BEGIN
+            );
+            // Process input and complete the requested task
+            if (command == Command.BEGIN) run();
+            else if (command == Command.ABOUT) about();
+            else throw new IllegalStateException("Invalid command: " + command);
+        } while (command != Command.BEGIN);
     }
 
     /**
      * Opens the about screen, providing information about Clue 2.0
      */
     private void about() {
-        // Not yet implemented
+        // Clear console
+        System.out.print("\033[H\033[2J");
+
+        // Tell the user about Clue 2.0
+        rollingPrintln("This project attempts to recreate the classic mystery game Clue, adding more modern features and items. This project was completed in its entirety by Alexander Chang. Unathorized reproduction " +
+            ANSI_WHITE_BACKGROUND + ANSI_BLACK + " or distribution " + ANSI_RESET + """
+             of this project is prohibited by law.
+            (c) 2024 by Alexander Chang. All rights reserved."""
+        );
+
+        // Provide instructions to return to the main menu
+        rollingPrintln("""
+            To return to the main menu, press enter.""");
+        String answer;
+        do{
+            answer = input.nextLine();
+        } while (!answer.equals(""));
+
+        // Clear console
+        System.out.print("\033[H\033[2J");
     }
 
     /**
@@ -100,7 +122,8 @@ public class Simulation {
 
         // If the input is not a recognized command or alias, clear the console and prompt the user again.
         while (!acceptedCommands.contains(answer)) {
-            System.out.print("\033[H\033[2J"); // Clear console
+            // Clear console
+            System.out.print("\033[H\033[2J");
 
             // Print the user prompt
             if(rolling){
