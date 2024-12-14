@@ -29,6 +29,7 @@ public class Simulation {
     public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
 
     private Scanner input;
+    private boolean gameActive;
 
     Simulation() {
         input = new Scanner(System.in);
@@ -39,7 +40,7 @@ public class Simulation {
         // Welcome the user
         System.out.println("""
         -----------------------
-          Welcome to Clue 2.0!
+          Welcome to Clue 2.0
         -----------------------""");
 
         Command command;
@@ -72,6 +73,7 @@ public class Simulation {
 
         // Provide instructions to return to the main menu
         rollingPrintln("""
+
             To return to the main menu, press enter.""");
         String answer;
         do{
@@ -87,6 +89,36 @@ public class Simulation {
      */
     private void run() {
         // Not yet implemented
+        
+        // Clear console
+        System.out.print("\033[H\033[2J");
+
+        // Introduction
+        rollingPrint("Welcome, detective. ");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            System.out.println();
+        }
+        
+        String[] messages = {"I've been awaiting your arrival. ", "Thank you for coming on such short notice. ","I'm Detective Victor with the local police department."};
+        for(int i = 0; i < messages.length - 1; i++) {
+            String message = messages[i];
+            rollingPrint(message);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                System.out.println();
+            }
+        }
+        rollingPrintln(messages[messages.length - 1]);
+
+        // Collect user details
+
+        gameActive = true;
+        while(gameActive) {
+
+        }
     }
 
     // Game Utility Methods
