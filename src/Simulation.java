@@ -180,13 +180,6 @@ public class Simulation {
         return ((Command)(Arrays.stream(commands).filter((a) -> a.matches(finalAnswer)).toArray()[0]));
     }
 
-    public boolean isInvalidCommand(String givenCommand, Command[] commands) {
-        for (Command command : commands){
-            if(command.matches(givenCommand)) return true;
-        }
-        return false;
-    }
-
     public static void rollingPrint(Object obj) {
         try {
             String output = obj.toString();
