@@ -5,7 +5,7 @@ import java.util.function.Predicate;
  * The Simulation class contains the core mechanics of the game including turn actions and prompting for input
  * 
  * @author Alexander Chang
- * @version 0.14, 12/13/2024
+ * @version 0.15, 12/16/2024
  */
 public class Simulation {
     // ANSI COLOR CODES
