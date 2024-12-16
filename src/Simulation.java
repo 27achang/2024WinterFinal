@@ -39,6 +39,10 @@ public class Simulation {
 
         clearConsole();
 
+        if (!pollANSISupport()) return;
+
+        clearConsole();
+
         // Welcome the user
         System.out.println("""
         -----------------------
@@ -57,6 +61,29 @@ public class Simulation {
             else if (command == Command.ABOUT) about();
             else throw new IllegalStateException("Invalid command: " + command);
         } while (command != Command.BEGIN);
+    }
+
+    /**
+     * Provide a user-guided test to determine whether the user is using a console that supports ANSI escape codes.
+     */
+    private boolean pollANSISupport() {
+        System.out.println("""
+            -----------------------------------------
+              ANSI Escape Code Support Confirmation
+            -----------------------------------------
+            """);
+        rollingPrint("As noted in the documentation for this project, proper execution of this execution requires the use of a console that supports ANSI escape codes. ");
+        textDelay(1000);
+        rollingPrint("These codes provide essential coloring and the ability to clear the console and directly support smooth gameplay. ");
+        textDelay(1000);
+        rollingPrint("Take a look at the next line:");
+        textDelay(1000);
+        System.out.println();
+        if (promptYesNo(ANSI_WHITE_BACKGROUND + ANSI_BLACK + " Hello, world! " + ANSI_RESET + "\nDo you see any additional text on the above line apart from the text ' Hello, world! '?", true) == Command.YES) {
+            System.out.println("Please find a console that supports ANSI support codes before running this project.");
+            return false;
+        }
+        return true;
     }
 
     /**
