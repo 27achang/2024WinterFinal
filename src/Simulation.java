@@ -101,8 +101,13 @@ public class Simulation {
             System.out.println();
         }
         
-        String[] messages = {"I've been awaiting your arrival. ", "Thank you for coming on such short notice. ","I'm Detective Victor with the local police department."};
-        for(int i = 0; i < messages.length - 1; i++) {
+        String[] messages = {
+            "I've been awaiting your arrival. ",
+            "Thank you for coming on such short notice. ",
+            "I'm Detective Joseph Kenny with the local police department. ",
+            "We recently received a report of a murder of famous millionare Brian Thompson."
+        };
+        for(int i = 0; i < messages.length; i++) {
             String message = messages[i];
             rollingPrint(message);
             try {
@@ -111,7 +116,21 @@ public class Simulation {
                 System.out.println();
             }
         }
-        rollingPrintln(messages[messages.length - 1]);
+        System.out.println();
+        System.out.println();
+        rollingPrint("Thomson was killed in his mansion last Thursday and the mystery killer's been on the run ever since. ");
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            System.out.println();
+        }
+        rollingPrintln("We need your help in solving this mystery.");
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            System.out.println();
+        }
+        promptYesNo("Are you willing to help?",true);
 
         // Collect user details
 
@@ -166,10 +185,57 @@ public class Simulation {
                 System.out.println(message);
             }
 
-            // Print the command options and update the list of accepted commands (including aliases)
+            // Print the command options
             for(Command command : commands) {
                 if(rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
                 else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
+            }
+        
+            // Allow the user to provide input
+            System.out.print("> ");
+            answer = input.nextLine();
+        }
+        final String finalAnswer = answer;
+        return ((Command)(Arrays.stream(commands).filter((a) -> a.matches(finalAnswer)).toArray()[0]));
+    }
+
+    /**
+     * Prompts the user for a yes/no input with rolling printing if {@code rolling} is true
+     * 
+     * @param message the message with which to prompt the user
+     * @param rolling whether the print to System output should be rolling
+     * @return the command selected by the user
+     */
+    public Command promptYesNo(String message, boolean rolling) {
+        String answer;
+        Command[] commands = {Command.YES, Command.NO};
+        ArrayList<String> acceptedCommands = new ArrayList<>();
+
+        // Print the user prompt
+        if(rolling) rollingPrintln(message);
+        else System.out.println(message);
+
+        // Print the command options and update the list of accepted commands (including aliases)
+        // This list will be used to validate the input
+        for(Command command : commands) {
+            acceptedCommands.add(command.getName());
+            if(command.containsAliases()) Arrays.stream(command.getAliases()).forEach((alias) -> acceptedCommands.add(alias));
+        }
+        
+        // Allow the user to provide input
+        System.out.print("> ");
+        answer = input.nextLine();
+
+        // If the input is not a recognized command or alias, clear the console and prompt the user again.
+        while (!acceptedCommands.contains(answer)) {
+            // Clear console
+            System.out.print("\033[H\033[2J");
+
+            // Print the user prompt
+            if(rolling){
+                rollingPrintln(message + " (yes/no)");
+            } else {
+                System.out.println(message + " (yes/no)");
             }
         
             // Allow the user to provide input

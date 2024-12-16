@@ -9,7 +9,9 @@ import java.util.Arrays;
  */
 public enum Command {
     ABOUT("about", "Learn more about Clue 2.0"),
-    BEGIN("begin","Start the game");
+    BEGIN("begin","Start the game"),
+    YES("yes","","y"),
+    NO("no","","n");
 
     private final String name;
     private String[] aliases = new String[0];
