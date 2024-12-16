@@ -34,8 +34,7 @@ public class Simulation {
     Simulation() {
         input = new Scanner(System.in);
 
-        // Clear console
-        System.out.print("\033[H\033[2J");
+        clearConsole();
 
         // Welcome the user
         System.out.println("""
@@ -61,8 +60,7 @@ public class Simulation {
      * Opens the about screen, providing information about Clue 2.0
      */
     private void about() {
-        // Clear console
-        System.out.print("\033[H\033[2J");
+        clearConsole();
 
         // Tell the user about Clue 2.0
         rollingPrintln("This project attempts to recreate the classic mystery game Clue, adding more modern features and items. This project was completed in its entirety by Alexander Chang. Unathorized reproduction " +
@@ -80,8 +78,7 @@ public class Simulation {
             answer = input.nextLine();
         } while (!answer.equals(""));
 
-        // Clear console
-        System.out.print("\033[H\033[2J");
+        clearConsole();
     }
 
     /**
@@ -90,8 +87,7 @@ public class Simulation {
     private void run() {
         // Not yet implemented
         
-        // Clear console
-        System.out.print("\033[H\033[2J");
+        clearConsole();
 
         // Introduction
         rollingPrint("Welcome, detective. ");
@@ -107,7 +103,7 @@ public class Simulation {
             "I'm Detective Joseph Kenny with the local police department. ",
             "We recently received a report of a murder of famous millionare Brian Thompson."
         };
-        for(int i = 0; i < messages.length; i++) {
+        for (int i = 0; i < messages.length; i++) {
             String message = messages[i];
             rollingPrint(message);
             try {
@@ -116,6 +112,7 @@ public class Simulation {
                 System.out.println();
             }
         }
+
         System.out.println();
         System.out.println();
         rollingPrint("Thomson was killed in his mansion last Thursday and the mystery killer's been on the run ever since. ");
@@ -130,9 +127,51 @@ public class Simulation {
         } catch (InterruptedException e) {
             System.out.println();
         }
-        promptYesNo("Are you willing to help?",true);
+        boolean willingToHelp = promptYesNo("Are you willing to help?",true) == Command.YES;
+
+        clearConsole();
+        
+        if (!willingToHelp) {
+            rollingPrintln("Well detective, it was nice meeting you. Farewell for now.");
+            return;
+        }
 
         // Collect user details
+
+        rollingPrint("Glad to hear that, detective. ");
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            System.out.println();
+        }
+        rollingPrint("Also, ");
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            System.out.println();
+        }
+        rollingPrintln("what's your name?");
+        System.out.print("> ");
+        String answer;
+        answer = input.nextLine();
+        
+        // The length of the name must be between 1 and 26, not inclusive.
+        while (answer.length() > 25 || answer.length() == 1) {
+            clearConsole();
+
+            // Provide an error message
+            rollingPrint("Are you sure that's a real name? ");
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                System.out.println();
+            }
+            rollingPrintln("It seems too \" + (answer.length() > 25 ? \"long.\" : \"short.\")");
+
+            // Prompt the user for a new name
+            System.out.print("> ");
+            answer = input.nextLine();
+        }
 
         gameActive = true;
         while(gameActive) {
@@ -173,8 +212,7 @@ public class Simulation {
 
         // If the input is not a recognized command or alias, clear the console and prompt the user again.
         while (!acceptedCommands.contains(answer)) {
-            // Clear console
-            System.out.print("\033[H\033[2J");
+            clearConsole();
 
             // Print the user prompt
             if(rolling){
@@ -228,8 +266,7 @@ public class Simulation {
 
         // If the input is not a recognized command or alias, clear the console and prompt the user again.
         while (!acceptedCommands.contains(answer)) {
-            // Clear console
-            System.out.print("\033[H\033[2J");
+            clearConsole();
 
             // Print the user prompt
             if(rolling){
@@ -244,6 +281,13 @@ public class Simulation {
         }
         final String finalAnswer = answer;
         return ((Command)(Arrays.stream(commands).filter((a) -> a.matches(finalAnswer)).toArray()[0]));
+    }
+
+    /**
+     * Clears the output console
+     */
+    public static void clearConsole() {
+        System.out.print("\033[H\033[2J");
     }
 
     public static void rollingPrint(Object obj) {
