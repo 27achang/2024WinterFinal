@@ -32,6 +32,7 @@ public class Simulation {
     private Scanner input;
     private boolean gameActive;
     private String name;
+    private String color;
     private int stamina = 100;
 
     Simulation() {
@@ -77,7 +78,6 @@ public class Simulation {
         rollingPrint("These codes provide essential coloring and the ability to clear the console and directly support smooth gameplay. ");
         textDelay(1000);
         rollingPrint("Take a look at the next line:");
-        textDelay(1000);
         System.out.println();
         if (promptYesNo(ANSI_WHITE_BACKGROUND + ANSI_BLACK + " Hello, world! " + ANSI_RESET + "\nDo you see any additional text on the above line apart from the text ' Hello, world! '?", true) == Command.YES) {
             System.out.println("Please find a console that supports ANSI support codes before running this project.");
@@ -135,7 +135,7 @@ public class Simulation {
 
         System.out.println();
         System.out.println();
-        rollingPrint("Thomson was killed in his mansion last Thursday and the mystery killer's been on the run ever since. ");
+        rollingPrint("Thomson was killed in his mansion just last night and the mystery killer's been on the run since. ");
         textDelay();
         rollingPrint("We need your help in solving this mystery.");
         textDelay(1000);
@@ -151,7 +151,7 @@ public class Simulation {
             rollingPrint("Well detective, it was nice meeting you. ");
             textDelay();
             rollingPrint("Farewell for now.");
-            textDelay(500);
+            textDelay();
             return;
         }
 
@@ -188,7 +188,7 @@ public class Simulation {
         rollingPrint("Finally, what's your favorite color? ");
         textDelay();
         rollingPrintln("(scarlet, mustard, white, green, blue, or plum)");
-        promptInput(true, "scarlet", "mustard", "white", "green", "blue", "plum");
+        color = promptInput(true, "scarlet", "mustard", "white", "green", "blue", "plum");
         rollingPrint("Oh, ");
         textDelay(250);
         rollingPrint("nice choice. ");
@@ -196,7 +196,33 @@ public class Simulation {
         rollingPrint("Let's head over to the crime scene now.");
         textDelay(1000);
 
-        clearConsole();
+        loadingAnimation(2);
+
+        rollingPrint("Alright, detective, ");
+        textDelay();
+        rollingPrint("here we are. ");
+        textDelay();
+        rollingPrint("Thompson was killed on the second floor of his mansion, which has 9 rooms wrapped around the central staircase. ");
+        textDelay();
+        rollingPrint("Since the murder's so recent, my team has only gotten a chance to secure the scene and hasn't started any of the investigation yet. ");
+        textDelay();
+        rollingPrint("I've decided to leave it up to you to solve.");
+        textDelay();
+        System.out.println();
+        System.out.println();
+        rollingPrint("If at any point you need to reach me or can't manage the investigation any longer for whatever reason, I'll be right downstairs with the media.");
+        textDelay();
+        System.out.println();
+        System.out.println();
+        rollingPrint("Best of luck, ");
+        textDelay(250);
+        rollingPrint("detective.");
+        System.out.println();
+        System.out.println();
+        textDelay(5000);
+        
+        rollingPrint("To begin, press enter.");
+        input.nextLine();
 
         // Begins the actual text adventure
         run();
@@ -207,7 +233,7 @@ public class Simulation {
      */
     private void run() {
         gameActive = true;
-        while(gameActive) {
+        while (gameActive) {
 
         }
     }
@@ -267,6 +293,44 @@ public class Simulation {
         }
         final String finalAnswer = answer;
         return ((Command)(Arrays.stream(commands).filter((a) -> a.matches(finalAnswer)).toArray()[0]));
+    }
+
+    /**
+     * Prompts the user for input with rolling printing if {@code rolling} is true
+     * 
+     * @param message the message with which to prompt the user
+     * @param rolling whether the print to system output should be rolling
+     * @param options the options to accept as valid input
+     * @return the option selected by the user
+     */
+    public String promptInput(String message, boolean rolling, String... options) {
+        ArrayList<String> acceptedOptions = new ArrayList<>();
+
+        // Print the user prompt
+        if (rolling) rollingPrintln(message);
+        else System.out.println(message);
+
+        // Update the list of accepted inputs
+        // This list will be used to validate the input
+        for (String option : options) acceptedOptions.add(option);
+        
+        // Allow the user to provide input
+        System.out.print("> ");
+        String answer = input.nextLine().toLowerCase();
+
+        // If the input is not a recognized option, prompt the user again.
+        while (!acceptedOptions.contains(answer)) {
+            clearConsole();
+
+            // Prompt the user again
+            if (rolling) rollingPrintln(message);
+            else System.out.println(message);
+
+            // Allow the user to provide input
+            System.out.print("> ");
+            answer = input.nextLine().toLowerCase();
+        }
+        return answer;
     }
 
     /**
@@ -431,6 +495,38 @@ public class Simulation {
     public static void textDelay(int millis) {
         try {
             Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            System.out.println();
+        }
+    }
+
+    /**
+     * Clears the console and prints a loading animations that cycles the given number of times.
+     * 
+     * @param cycles the number of times to cycle the loading animation
+     * @throws IllegalArgumentException if {@code cycles} is less negative or zero.
+     */
+    public static void loadingAnimation(int cycles) throws IllegalArgumentException {
+        if (cycles <= 0) throw new IllegalArgumentException("Illegal number of loading animation cycles");
+        clearConsole();
+        for (int i = 0; i < cycles; i++) {
+            for(int j = 0; j < 5; j++) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.out.println();
+                }
+                System.out.print(".");
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                System.out.println();
+            }
+            clearConsole();
+        }
+        try {
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             System.out.println();
         }
