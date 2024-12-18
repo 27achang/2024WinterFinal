@@ -19,6 +19,7 @@ public class Simulation {
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
+    public static final String ANSI_GRAY = "\u001B[90m";
 
     public static final String ANSI_BLACK_BACKGROUND = "\u001B[40m";
     public static final String ANSI_RED_BACKGROUND = "\u001B[41m";
@@ -28,12 +29,50 @@ public class Simulation {
     public static final String ANSI_PURPLE_BACKGROUND = "\u001B[45m";
     public static final String ANSI_CYAN_BACKGROUND = "\u001B[46m";
     public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
+    public static final String ANSI_GRAY_BACKGROUND = "\u001B[100m";
+
+    // 1 becomes a space and start of room color
+    // 2 becomes a space and end of room color
+    // 3 becomes a slash and end of room color
+    // 4 becomes a backslash and start of room color
+    private final String map = """
+        XXXXXXXXXXXXXXXXXXXXXXXXXX
+        X1    2X XXXXXXXXSX1    2X
+        X1    2|  |    |  |1    2X
+        X4    2|  |    |  |1    2X
+        X------|  |    |  |1    2X
+        XX     ^ >|    |  |1    3X
+        XL        |    |  |------X
+        XX-----   ------  ^     XX
+        X1    2|    ^^          MX
+        X1    2|< |1 2|   v     XX
+        X1    2|  |1 2|  |-------X
+        XX-----   |1 2|  |1     2X
+        XXv ^     -----  |1     2X
+        X-----|         >|1     2X
+        X1   2|          |1     2X
+        X1   2|          |--1   2X
+        X1   2|<            -----X
+        X-----|   v    v        XX
+        XX       |------|   v    X
+        XP       |1    2|  |----XX
+        XX---|< >|1    2|< |1   2X
+        X1/  2|  |1    2|  |1   2X
+        X1   2|  |1    2|  |1   2X
+        X1   2|  |--  --|  |1   2X
+        X1    2X   |12|   X4    2X
+        XXXXXXXXXX XXXX XXXXXXXXXX
+        XXXXXXXXXXXXXXXXXXXXXXXXXX""";
 
     private Scanner input;
     private boolean gameActive;
     private String name;
     private String color;
     private int stamina = 100;
+    private Room[] visitedRooms;
+    private Room currentRoom;
+    private int x_pos; // Starting at 1
+    private int y_pos; // Starting at 1
 
     Simulation() {
         input = new Scanner(System.in);
@@ -68,6 +107,7 @@ public class Simulation {
      * Provide a user-guided test to determine whether the user is using a console that supports ANSI escape codes.
      */
     private boolean pollANSISupport() {
+        printMap();
         System.out.println("""
             -----------------------------------------
               ANSI Escape Code Support Confirmation
@@ -210,6 +250,10 @@ public class Simulation {
         textDelay();
         System.out.println();
         System.out.println();
+        rollingPrint("Here's a map of the top floor. ");
+        textDelay();
+        rollingPrint("The double-barred lines represent doors to each room. ");
+        textDelay();
         rollingPrint("If at any point you need to reach me or can't manage the investigation any longer for whatever reason, I'll be right downstairs with the media.");
         textDelay();
         System.out.println();
@@ -234,11 +278,182 @@ public class Simulation {
     private void run() {
         gameActive = true;
         while (gameActive) {
-
+            
         }
     }
 
     // Game Utility Methods
+
+    /**
+     * Prints the game map, showing room names on rooms which have been visited.
+     */
+    private void printMap() {
+        // 24 across 25 down
+        /*
+         * https://www.unicode.org/charts/PDF/U2500.pdf
+         * https://www.compart.com/en/unicode/block/U+2500
+         * 
+         * ┏━━━━━━━━━━━┓ ┏━┓               ┏━┓ ┏━━━━━━━━━━━┓
+         * ┃           ┃ ┃ ┃               ┃S┃ ┃           ┃
+         * ┃           ┗━╉─╄━┳━━━━━━━━━━━┳━╉─╄━┛           ┃
+         * ┃             ┃ │ ┃           ┃ │ ┃             ┃
+         * ┃    STUDY    ┠─┼─┨           ┠─┼─┨             ┃
+         * ┃             ┃ │ ┃           ┃ │ ┃             ┃
+         * ┃             ┠─┼─┨           ┠─┼─┨   LOUNGE    ┃
+         * ┃             ┃ │ ┃           ┃ │ ┃             ┃
+         * ┗━┳━┯━┯━┯━┯━┯═╃─┼─┨   HALL    ┠─┼─┨             ┃
+         *   ┃ │ │ │ │ │ │ │ ║           ┃ │ ┃             ┃
+         * ┏━╃─┼─┼─┼─┼─┼─┼─┼─┨           ┠─┼─┨             ┃
+         * ┃L│ │ │ │ │ │ │ │ ┃           ┃ │ ┃             ┃
+         * ┗━╈━┷━┷━┷━┷━╅─┼─┼─┨           ┠─┼─╄═┯━┯━┯━┯━┯━┳━┛
+         *   ┃         ┃ │ │ ┃           ┃ │ │ │ │ │ │ │ ┃
+         * ┏━┛         ┗━╅─┼─╄━┯━┯═╤═┯━┯━╃─┼─┼─┼─┼─┼─┼─┼─╄━┓
+         * ┃             ┃ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │M┃
+         * ┃             ┠─┼─╁─┴─┴─┴─┴─╁─┼─┼─┼─┼─┼─┼─┼─┼─╆━┛
+         * ┃   LIBRARY   ║ │ ┃         ┃ │ │ │ │ │ │ │ │ ┃
+         * ┃             ┠─┼─┨         ┠─┼─╆━┷━┷━┷━┷━┷━┷━┻━┓
+         * ┃             ┃ │ ┃         ┃ │ ┃               ┃
+         * ┗━┓         ┏━╃─┼─┨STAIRCASE┠─┼─┨               ┃
+         *   ┃         ┃ │ │ ┃         ┃ │ ┃               ┃
+         *   ┣━┯━┯═┯━┯━╃─┼─┼─┨         ┠─┼─┨               ┃
+         *   ┃ │ │ │ │ │ │ │ ┃         ┃ │ ┃               ┃
+         * ┏━┻═┷━┷━┷━┷━╅─┼─┼─╄━┯━┯━┯━┯━╃─┼─┨               ┃
+         * ┃           ┃ │ │ │ │ │ │ │ │ │ ║  DINING ROOM  ┃
+         * ┃           ┠─┼─┼─┼─┼─┼─┼─┼─┼─┼─┨               ┃
+         * ┃           ┃ │ │ │ │ │ │ │ │ │ ┃               ┃
+         * ┃ BILLIARD  ┠─┼─┼─┼─┼─┼─┼─┼─┼─┼─┨               ┃
+         * ┃           ┃ │ │ │ │ │ │ │ │ │ ┃               ┃
+         * ┃   ROOM    ┠─┼─┼─┼─┼─┼─┼─┼─┼─┼─╄━┯━┯━┓         ┃
+         * ┃           ║ │ │ │ │ │ │ │ │ │ │ │ │ ┃         ┃
+         * ┃           ┠─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─┼─╄━┯━┯━┯━┳━┛
+         * ┃           ┃ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ ┃
+         * ┗━┳━┯━┯━┯━┯━╃─┼─╆━═━┷━┷━┷━┷━┷═┷━╅─┼─┼─┼─┼─┼─┼─╄━┓
+         *   ┃ │ │ │ │ │ │ ┃               ┃ │ │ │ │ │ │ │ ┃
+         * ┏━╃─┼─┼─┼─┼─┼─┼─┨               ┠─┼─╆━┷═┷━┷━┷━╈━┛
+         * ┃P│ │ │ │ │ │ │ ┃               ┃ │ ┃         ┗━┓
+         * ┗━╈━┷━┷━┷━╅─┼─┼─┨               ┠─┼─┨           ┃
+         *   ┃       ║ │ │ ║               ║ │ ┃           ┃
+         * ┏━┛       ┗━╅─┼─┨   BALL ROOM   ┠─┼─┨           ┃
+         * ┃           ┃ │ ┃               ┃ │ ┃           ┃
+         * ┃           ┠─┼─┨               ┠─┼─┨  KITCHEN  ┃
+         * ┃  CONSER-  ┃ │ ┃               ┃ │ ┃           ┃
+         * ┃  VATORY   ┠─┼─┨               ┠─┼─┨           ┃
+         * ┃           ┃ │ ┃               ┃ │ ┃           ┃
+         * ┃           ┣━╅─╄━┯━┓       ┏━┯━╃─╆━┫           ┃
+         * ┃           ┃ ┃ │ │ ┃       ┃ │ │ ┃ ┃           ┃
+         * ┗━━━━━━━━━━━┛ ┗━┷━╅─╊━━━━━━━╉─╆━┷━┛ ┗━━━━━━━━━━━┛
+         *                   ┃G┃       ┃W┃
+         *                   ┗━┛       ┗━┛
+         * 
+         * \u250F\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2513 \u250F\u2501\u2513               \u250F\u2501\u2513 \u250F\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2513
+         * \u2503           \u2503 \u2503 \u2503               \u2503S\u2503 \u2503           \u2503
+         * \u2503           \u2517\u2501\u2549\u2500\u2544\u2501\u2533\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2533\u2501\u2549\u2500\u2544\u2501\u251B           \u2503
+         * \u2503             \u2503 \u2502 \u2503           \u2503 \u2502 \u2503             \u2503
+         * \u2503    STUDY    \u2520\u2500\u253C\u2500\u2528           \u2520\u2500\u253C\u2500\u2528             \u2503
+         * \u2503             \u2503 \u2502 \u2503           \u2503 \u2502 \u2503             \u2503
+         * \u2503             \u2520\u2500\u253C\u2500\u2528           \u2520\u2500\u253C\u2500\u2528   LOUNGE    \u2503
+         * \u2503             \u2503 \u2502 \u2503           \u2503 \u2502 \u2503             \u2503
+         * \u2517\u2501\u2533\u2501\u252F\u2501\u252F\u2501\u252F\u2501\u252F\u2501\u252F\u2550\u2543\u2500\u253C\u2500\u2528   HALL    \u2520\u2500\u253C\u2500\u2528             \u2503
+         *   \u2503 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2551           \u2503 \u2502 \u2503             \u2503
+         * \u250F\u2501\u2543\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u2528           \u2520\u2500\u253C\u2500\u2528             \u2503
+         * \u2503L\u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2503           \u2503 \u2502 \u2503             \u2503
+         * \u2517\u2501\u2548\u2501\u2537\u2501\u2537\u2501\u2537\u2501\u2537\u2501\u2545\u2500\u253C\u2500\u253C\u2500\u2528           \u2520\u2500\u253C\u2500\u2544\u2550\u252F\u2501\u252F\u2501\u252F\u2501\u252F\u2501\u252F\u2501\u2533\u2501\u251B
+         *   \u2503         \u2503 \u2502 \u2502 \u2503           \u2503 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2503
+         * \u250F\u2501\u251B         \u2517\u2501\u2545\u2500\u253C\u2500\u2544\u2501\u252F\u2501\u252F\u2550\u2564\u2550\u252F\u2501\u252F\u2501\u2543\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u2544\u2501\u2513
+         * \u2503             \u2503 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502M\u2503
+         * \u2503             \u2520\u2500\u253C\u2500\u2541\u2500\u2534\u2500\u2534\u2500\u2534\u2500\u2534\u2500\u2541\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u2546\u2501\u251B
+         * \u2503   LIBRARY   \u2551 \u2502 \u2503         \u2503 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2503
+         * \u2503             \u2520\u2500\u253C\u2500\u2528         \u2520\u2500\u253C\u2500\u2546\u2501\u2537\u2501\u2537\u2501\u2537\u2501\u2537\u2501\u2537\u2501\u2537\u2501\u253B\u2501\u2513
+         * \u2503             \u2503 \u2502 \u2503         \u2503 \u2502 \u2503               \u2503
+         * \u2517\u2501\u2513         \u250F\u2501\u2543\u2500\u253C\u2500\u2528STAIRCASE\u2520\u2500\u253C\u2500\u2528               \u2503
+         *   \u2503         \u2503 \u2502 \u2502 \u2503         \u2503 \u2502 \u2503               \u2503
+         *   \u2523\u2501\u252F\u2501\u252F\u2550\u252F\u2501\u252F\u2501\u2543\u2500\u253C\u2500\u253C\u2500\u2528         \u2520\u2500\u253C\u2500\u2528               \u2503
+         *   \u2503 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2503         \u2503 \u2502 \u2503               \u2503
+         * \u250F\u2501\u253B\u2550\u2537\u2501\u2537\u2501\u2537\u2501\u2537\u2501\u2545\u2500\u253C\u2500\u253C\u2500\u2544\u2501\u252F\u2501\u252F\u2501\u252F\u2501\u252F\u2501\u2543\u2500\u253C\u2500\u2528               \u2503
+         * \u2503           \u2503 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2551  DINING ROOM  \u2503
+         * \u2503           \u2520\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u2528               \u2503
+         * \u2503           \u2503 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2503               \u2503
+         * \u2503 BILLIARD  \u2520\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u2528               \u2503
+         * \u2503           \u2503 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2503               \u2503
+         * \u2503   ROOM    \u2520\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u2544\u2501\u252F\u2501\u252F\u2501\u2513         \u2503
+         * \u2503           \u2551 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2503         \u2503
+         * \u2503           \u2520\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u2544\u2501\u252F\u2501\u252F\u2501\u252F\u2501\u2533\u2501\u251B
+         * \u2503           \u2503 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2503
+         * \u2517\u2501\u2533\u2501\u252F\u2501\u252F\u2501\u252F\u2501\u252F\u2501\u2543\u2500\u253C\u2500\u2546\u2501\u2550\u2501\u2537\u2501\u2537\u2501\u2537\u2501\u2537\u2501\u2537\u2550\u2537\u2501\u2545\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u2544\u2501\u2513
+         *   \u2503 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2503               \u2503 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2503
+         * \u250F\u2501\u2543\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u253C\u2500\u2528               \u2520\u2500\u253C\u2500\u2546\u2501\u2537\u2550\u2537\u2501\u2537\u2501\u2537\u2501\u2548\u2501\u251B
+         * \u2503P\u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2502 \u2503               \u2503 \u2502 \u2503         \u2517\u2501\u2513
+         * \u2517\u2501\u2548\u2501\u2537\u2501\u2537\u2501\u2537\u2501\u2545\u2500\u253C\u2500\u253C\u2500\u2528               \u2520\u2500\u253C\u2500\u2528           \u2503
+         *   \u2503       \u2551 \u2502 \u2502 \u2551               \u2551 \u2502 \u2503           \u2503
+         * \u250F\u2501\u251B       \u2517\u2501\u2545\u2500\u253C\u2500\u2528   BALL ROOM   \u2520\u2500\u253C\u2500\u2528           \u2503
+         * \u2503           \u2503 \u2502 \u2503               \u2503 \u2502 \u2503           \u2503
+         * \u2503           \u2520\u2500\u253C\u2500\u2528               \u2520\u2500\u253C\u2500\u2528  KITCHEN  \u2503
+         * \u2503  CONSER-  \u2503 \u2502 \u2503               \u2503 \u2502 \u2503           \u2503
+         * \u2503  VATORY   \u2520\u2500\u253C\u2500\u2528               \u2520\u2500\u253C\u2500\u2528           \u2503
+         * \u2503           \u2503 \u2502 \u2503               \u2503 \u2502 \u2503           \u2503
+         * \u2503           \u2523\u2501\u2545\u2500\u2544\u2501\u252F\u2501\u2513       \u250F\u2501\u252F\u2501\u2543\u2500\u2546\u2501\u252B           \u2503
+         * \u2503           \u2503 \u2503 \u2502 \u2502 \u2503       \u2503 \u2502 \u2502 \u2503 \u2503           \u2503
+         * \u2517\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u251B \u2517\u2501\u2537\u2501\u2545\u2500\u254A\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2549\u2500\u2546\u2501\u2537\u2501\u251B \u2517\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u251B
+         *                   \u2503G\u2503       \u2503W\u2503
+         *                   \u2517\u2501\u251B       \u2517\u2501\u251B
+         */
+        /*
+         * XXXXXXXXXXXXXXXXXXXXXXXXXX
+         * X      X XXXXXXXXSX      X
+         * X      |  |    |  |      X
+         * X\     |  |    |  |      X
+         * X------|  |    |  |      X
+         * XX     ^ >|    |  |     /X
+         * XL        |    |  |------X
+         * XX-----   ------  ^     XX
+         * X      |    ^^          MX
+         * X      |< |   |   v     XX
+         * X      |  |   |  |-------X
+         * XX-----   |   |  |       X
+         * XXv ^     -----  |       X
+         * X-----|         >|       X
+         * X     |          |       X
+         * X     |          |--     X
+         * X     |<            -----X
+         * X-----|   v    v        XX
+         * XX       |------|   v    X
+         * XP       |      |  |----XX
+         * XX---|< >|      |< |     X
+         * X /   |  |      |  |     X
+         * X     |  |      |  |     X
+         * X     |  |--  --|  |     X
+         * X      X   |  |   X\     X
+         * XXXXXXXXXX XXXX XXXXXXXXXX
+         * XXXXXXXXXXXXXXXXXXXXXXXXXX
+         */
+        for (int i = 0; i < map.length(); i++) {
+            switch (map.charAt(i)) {
+                case 'X':
+                    System.out.print(ANSI_RED_BACKGROUND + " " + ANSI_RESET);
+                    break;
+                
+                case '1':
+                    System.out.print(ANSI_GRAY_BACKGROUND + " ");
+                    break;
+                
+                case '2':
+                    System.out.print(" " + ANSI_RESET);
+                    break;
+
+                case '3':
+                    System.out.print("/" + ANSI_RESET);
+                    break;
+                
+                case '4':
+                    System.out.print("\\" + ANSI_GRAY_BACKGROUND);
+                    break;
+
+                default:
+                    System.out.print(map.charAt(i));
+                    break;
+            }
+        }
+    }
 
     /**
      * Prompts the user for input with a choice from the given commands and with rolling printing if {@code rolling} is true
