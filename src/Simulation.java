@@ -68,25 +68,25 @@ public class Simulation {
     private static final char[][] mapArray = {
         {' ', ' ', ' ', ' ', ' ', ' ', 'X', ' ', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'S', 'X', ' ', ' ', ' ', ' ', ' ', ' '},
         {' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' '},
-        {'\\', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' '},
+        {'\\', ' ', ' ', ' ', ' ', 'v', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' '},
         {'-', '-', '-', '-', '-', '-', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' '},
-        {'X', ' ', ' ', ' ', ' ', ' ', '^', ' ', '>', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', '/'},
-        {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', '-', '-', '-', '-', '-', '-'},
+        {'X', ' ', ' ', ' ', ' ', ' ', '^', ' ', '>', '|', '<', ' ', ' ', ' ', '|', ' ', ' ', '|', 'v', ' ', ' ', ' ', ' ', '/'},
+        {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', 'v', 'v', ' ', '|', ' ', ' ', '|', '-', '-', '-', '-', '-', '-'},
         {'X', '-', '-', '-', '-', '-', ' ', ' ', ' ', '-', '-', '-', '-', '-', '|', ' ', ' ', '^', ' ', ' ', ' ', ' ', ' ', 'X'},
         {' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', '^', '^', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-        {' ', ' ', ' ', ' ', ' ', ' ', '|', '<', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', ' ', 'v', ' ', ' ', ' ', ' ', ' ', 'X'},
-        {' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', '|', '-', '-', '-', '-', '-', '-', '-'},
-        {'X', '-', '-', '-', '-', '-', ' ', ' ', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', '>', '|', '<', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', ' ', 'v', ' ', ' ', ' ', ' ', ' ', 'X'},
+        {' ', ' ', ' ', 'v', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', '|', '-', '-', '-', '-', '-', '-', '-'},
+        {'X', '-', '-', '-', '-', '-', ' ', ' ', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', '|', '^', ' ', ' ', ' ', ' ', ' ', ' '},
         {'X', 'v', ' ', '^', ' ', ' ', ' ', ' ', ' ', '-', '-', '-', '-', '-', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-        {'-', '-', '-', '-', '-', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '>', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-        {' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+        {'-', '-', '-', '-', '-', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '>', '|', '<', ' ', ' ', ' ', ' ', ' ', ' '},
+        {' ', '^', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
         {' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', '-', '-', ' ', ' ', ' ', ' ', ' '},
-        {' ', ' ', ' ', ' ', ' ', '|', '<', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '-', '-', '-', '-', '-'},
+        {' ', ' ', ' ', ' ', '>', '|', '<', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '-', '-', '-', '-', '-'},
         {'-', '-', '-', '-', '-', '|', ' ', ' ', ' ', 'v', ' ', ' ', ' ', ' ', 'v', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X'},
         {'X', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', '-', '-', '-', '-', '-', '-', '|', ' ', ' ', ' ', 'v', ' ', ' ', ' ', ' '},
-        {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', '-', '-', '-', '-', 'X'},
-        {'X', '-', '-', '-', '|', '<', ' ', '>', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|', '<', ' ', '|', ' ', ' ', ' ', ' ', ' '},
-        {' ', '/', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', '^', ' ', ' ', ' ', ' ', '^', '|', ' ', ' ', '|', '-', '-', '-', '-', 'X'},
+        {'X', '-', '-', '-', '|', '<', ' ', '>', '|', '<', ' ', ' ', ' ', ' ', '>', '|', '<', ' ', '|', '^', ' ', ' ', ' ', ' '},
+        {' ', '/', ' ', ' ', '>', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' '},
         {' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' '},
         {' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', '-', '-', ' ', ' ', '-', '-', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' '},
         {' ', ' ', ' ', ' ', ' ', ' ', 'X', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', 'X', '\\', ' ', ' ', ' ', ' ', ' '},
@@ -97,10 +97,14 @@ public class Simulation {
     private boolean gameActive;
     private String name;
     private String color;
-    private int stamina = 100;
-    private Room[] visitedRooms;
+    private int turns;
+    private ArrayList<Room> visitedRooms = new ArrayList<>();
     private Room currentRoom;
-    private Item[] inventory;
+    private boolean roomSearched;
+    private ArrayList<Item> inventory = new ArrayList<>();
+    private int numDonuts;
+    private int totalDonutsFound;
+    private int turnsSinceLastDonutFound; // Only donuts found in the kitchen
     private int xPos; // Starting at 1
     private int yPos; // Starting at 1
 
@@ -108,6 +112,12 @@ public class Simulation {
         input = new Scanner(System.in);
 
         clearConsole();
+
+        name = "Danny";
+        color = "green";
+        xPos = 6;
+        yPos = 20;
+        run();
 
         if (!pollANSISupport()) return;
 
@@ -281,9 +291,9 @@ public class Simulation {
         System.out.println();
         rollingPrint("Here's a map of the top floor. ");
         textDelay();
-        rollingPrint("The double-barred lines represent doors to each room. ");
+        rollingPrint("The arrows represent entrances to each room. ");
         textDelay();
-        rollingPrint("If at any point you need to reach me or can't manage the investigation any longer for whatever reason, I'll be right downstairs with the media.");
+        rollingPrint("If at any point you need to reach me or can't manage the investigation any longer for whatever reason, I'll be right at the base of the central staircase with the media.");
         textDelay();
         System.out.println();
         System.out.println();
@@ -297,6 +307,7 @@ public class Simulation {
         rollingPrint("To begin, press enter.");
         input.nextLine();
 
+        // Spawn the user
         switch (color) {
             case "scarlet":
                 xPos = 17;
@@ -344,24 +355,164 @@ public class Simulation {
     private void run() {
         gameActive = true;
         while (gameActive) {
+            clearConsole();
             printMap();
-            // U+0008 is backspace
             // Determine the actions available to the user
             ArrayList<Command> options = new ArrayList<>();
-            if (currentRoom == null) {
-                // Determine up down left right
-                char currentCell = mapArray[yPos - 1][xPos - 1];
+            char currentCell = mapArray[yPos - 1][xPos - 1];
+
+            if (currentRoom == Room.STAIRCASE) {
+                options.add(Command.UP);
+                options.add(Command.SUBMIT_DNA);
+                options.add(Command.SUBMIT_FINGERPRINTS);
+                if(numDonuts >= 1) options.add(Command.REQUEST_CAMERA);
+            } else {
+                // Determine available movement options
                 char aboveCell = (yPos == 1 ? ' ' : mapArray[yPos - 2][xPos - 1]);
                 char belowCell = (yPos == 25 ? ' ' : mapArray[yPos][xPos - 1]);
                 char leftCell = (xPos == 1 ? ' ' : mapArray[yPos - 1][xPos - 2]);
                 char rightCell = (xPos == 24 ? ' ' : mapArray[yPos - 1][xPos]);
                 if (yPos != 1 && (currentCell == '^' || (aboveCell != '|' && aboveCell != '-' && aboveCell != 'X'))) options.add(Command.UP);
-                else if (yPos != 25 && (currentCell == 'v' || (belowCell != '|' && belowCell != '-' && belowCell != 'X'))) options.add(Command.DOWN);
-                else if (xPos != 1 && (currentCell == '<' || (leftCell != '|' && leftCell != '-' && leftCell != 'X'))) options.add(Command.LEFT);
-                else if (xPos != 24 && (currentCell == '>' || (rightCell != '|' && rightCell != '-' && rightCell != 'X'))) options.add(Command.RIGHT);
-                Command action = promptInput("So, detective, what do you want to do?", true, options);
+                if (yPos != 25 && (currentCell == 'v' || (belowCell != '|' && belowCell != '-' && belowCell != 'X'))) options.add(Command.DOWN);
+                if (xPos != 1 && (currentCell == '<' || (leftCell != '|' && leftCell != '-' && leftCell != 'X'))) options.add(Command.LEFT);
+                if (xPos != 24 && (currentCell == '>' || (rightCell != '|' && rightCell != '-' && rightCell != 'X'))) options.add(Command.RIGHT);
+                if (currentRoom != null && currentRoom != Room.STAIRCASE && !roomSearched) options.add(Command.SEARCH);
+            }
+
+            // Determine if the inventory can be opened
+            if (inventory.size() > 0) options.add(Command.INVENTORY);
+
+            // Prompt the user to choose from the available options
+            Command action = promptInput("So, detective, what do you want to do?", false, options);
+            // If the user is trying to enter or leave a room with a 'diagonal' door (study, lounge, and conservatory), process the action.
+            if (xPos == 6 && yPos == 3 && action == Command.DOWN) {
+                xPos++;
+                yPos += 2;
+                currentRoom = null;
+                roomSearched = false;
+            } else if (xPos == 7 && yPos == 5 && action == Command.UP) {
+                xPos--;
+                yPos -= 2;
+            } else if (xPos == 19 && yPos == 5 && action == Command.DOWN) {
+                xPos--;
+                yPos += 2;
+                currentRoom = null;
+                roomSearched = false;
+            } else if (xPos == 18 && yPos == 7 && action == Command.UP) {
+                xPos++;
+                yPos -= 2;
+            } else if (xPos == 5 && yPos == 21 && action == Command.RIGHT) {
+                xPos++;
+                yPos--;
+                currentRoom = null;
+                roomSearched = false;
+            } else if (xPos == 6 && yPos == 20 && action == Command.LEFT) {
+                xPos--;
+                yPos++;
+            }
+            // Process any other entry or exit from rooms
+            else if (currentCell == '^' && action == Command.UP) {
+                yPos -= 2;
+                if(currentRoom != null) {
+                    currentRoom = null;
+                    roomSearched = false;
+                }
+            } else if (currentCell == 'v' && action == Command.DOWN) {
+                yPos += 2;
+                if(currentRoom != null) {
+                    currentRoom = null;
+                    roomSearched = false;
+                }
+            } else if (currentCell == '<' && action == Command.LEFT) {
+                xPos -= 2;
+                if(currentRoom != null) {
+                    currentRoom = null;
+                    roomSearched = false;
+                }
+            } else if (currentCell == '>' && action == Command.RIGHT) {
+                xPos += 2;
+                if(currentRoom != null) {
+                    currentRoom = null;
+                    roomSearched = false;
+                }
+            }
+            // Process standard motion and other actions
+            else switch (action) {
+                case Command.UP -> yPos--;
+                case Command.DOWN -> yPos++;
+                case Command.LEFT -> xPos--;
+                case Command.RIGHT -> xPos++;
+                case Command.INVENTORY -> openInventory();
+                case Command.SEARCH -> searchRoom();
+                default -> throw new IllegalStateException("Unexpected game command execution");
+            }
+
+            // If the user entered a room, update the currentRoom variable
+            try {
+                currentRoom = Arrays.stream(Room.values()).filter((a) -> Arrays.stream(a.getEntrances()).anyMatch((b) -> b[0] == xPos && b[1] == yPos)).findFirst().get();
+                if(!visitedRooms.contains(currentRoom)) visitedRooms.add(currentRoom);
+            } catch (NoSuchElementException e) {}
+
+            // Increment the turns counters
+            turns++;
+            if (totalDonutsFound > 0) turnsSinceLastDonutFound++;
+        }
+    }
+
+    private void searchRoom() {
+        roomSearched = true;
+        /*
+         * Kitchen:
+         *  On 5th turn after last donut finding:
+         *   20% Nothing found
+         *   10% 1 donut
+         *   50% 2 donuts
+         *   15% 3 donuts
+         *   4% 4 donuts
+         *   1% 5 donuts
+         * 
+         * Other Rooms:
+         *  No items left to find:
+         *   99% Nothing found
+         *   1% 1 donut
+         *  Otherwise:
+         *   70% Nothing found
+         *   10% Fingerprint collector
+         *   10% DNA collector
+         *   10% UV scanner
+         */
+        double random = Math.random();
+        if (currentRoom == Room.KITCHEN) {
+            if (turnsSinceLastDonutFound < 5 || random < 0.2) rollingPrint("You found nothing!");
+            else if (random < 0.3) getDonuts(1);
+            else if (random <= 0.8) getDonuts(2);
+            else if (random <= 0.95) getDonuts(3);
+            else if (random <= 0.99) getDonuts(4);
+            else getDonuts(5);
+        } else {
+            if (inventory.contains(Item.FINGERPRINT_COLLECTOR) && inventory.contains(Item.DNA_COLLECTOR) && inventory.contains(Item.UV_SCANNER)) {
+                if (random < 0.99) rollingPrint("You found nothing!");
+                else getDonuts(1);
+            } else {
+                if (random <= 0.7) rollingPrint("You found nothing!");
+                else if (random < 0.8) getItem(Item.FINGERPRINT_COLLECTOR);
+                else if (random < 0.9) getItem(Item.DNA_COLLECTOR);
+                else getItem(Item.UV_SCANNER);
             }
         }
+        textDelay(2000);
+    }
+
+    private void getDonuts(int numFound) {
+        rollingPrint("You found " + numFound + " donut" + (numFound > 1 ? "s" : "") +"!");
+        numDonuts += numFound;
+        totalDonutsFound += numFound;
+        if (currentRoom == Room.KITCHEN) turnsSinceLastDonutFound = 0;
+    }
+
+    private void getItem(Item itemFound) {
+        rollingPrint("You found a " + itemFound.getName() + "!");
+        inventory.add(itemFound);
     }
 
     // Game Utility Methods
@@ -508,36 +659,57 @@ public class Simulation {
          * XXXXXXXXXX XXXX XXXXXXXXXX
          * XXXXXXXXXXXXXXXXXXXXXXXXXX
          */
-        for (int i = 0; i < map.length(); i++) {
-            if (i == 27 * yPos + xPos) System.out.print(ANSI_WHITE_BACKGROUND + " " + ANSI_RESET);
-            else switch (map.charAt(i)) {
+        boolean inRoom = false;
+         for (int i = 0; i < map.length(); i++) {
+            if (map.charAt(i) == '1' || map.charAt(i) == '4') inRoom = true;
+            else if (map.charAt(i) == '2' || map.charAt(i) == '3') inRoom = false;
+            switch (map.charAt(i)) {
                 case 'X':
-                    System.out.print(ANSI_RED_BACKGROUND + " ");
+                    System.out.print(ANSI_RED_BACKGROUND + '\u00A0');
                     if(i == map.length() - 1 || map.charAt(i + 1) != 'X') System.out.print(ANSI_RESET);
                     break;
                 
                 case '1':
-                    System.out.print(ANSI_GRAY_BACKGROUND + " ");
+                    if (i == 27 * yPos + xPos) System.out.print(ANSI_WHITE_BACKGROUND + " " + ANSI_GRAY_BACKGROUND);
+                    else System.out.print(ANSI_GRAY_BACKGROUND + " ");
                     break;
                 
                 case '2':
-                    System.out.print(" " + ANSI_RESET);
+                    if (i == 27 * yPos + xPos) System.out.print(ANSI_WHITE_BACKGROUND + " " + ANSI_RESET);
+                    else System.out.print(" " + ANSI_RESET);
                     break;
 
                 case '3':
-                    System.out.print("/" + ANSI_RESET);
+                    if (i == 27 * yPos + xPos) System.out.print(ANSI_WHITE_BACKGROUND + "/" + ANSI_RESET);
+                    else System.out.print("/" + ANSI_RESET);
                     break;
                 
                 case '4':
-                    System.out.print("\\" + ANSI_GRAY_BACKGROUND);
+                    if (i == 27 * yPos + xPos) System.out.print(ANSI_WHITE_BACKGROUND + "\\" + ANSI_GRAY_BACKGROUND);
+                    else System.out.print(ANSI_GRAY_BACKGROUND + "\\");
                     break;
 
                 default:
-                    System.out.print(map.charAt(i));
+                    if (i == 27 * yPos + xPos) System.out.print(ANSI_WHITE_BACKGROUND + map.charAt(i) + (inRoom ? ANSI_GRAY_BACKGROUND : ANSI_RESET));
+                    else System.out.print(map.charAt(i));
                     break;
             }
         }
         System.out.println();
+    }
+
+    /**
+     * Opens the player's inventory
+     */
+    private void openInventory() {
+        clearConsole();
+
+        rollingPrintln("===== Your Inventory =====");
+        if (numDonuts > 0) rollingPrintln(numDonuts + " donuts");
+        inventory.forEach((a) -> rollingPrintln(a.getName() + " - " + a.getDescription()));
+        System.out.println();
+        rollingPrint("To return to the map, press enter");
+        input.nextLine();
     }
 
     /**

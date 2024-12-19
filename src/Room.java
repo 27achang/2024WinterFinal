@@ -7,16 +7,30 @@ import java.util.Scanner;
  * @version 0.14, 12/13/2024
  */
 public enum Room {
-    HALL,
-    LOUNGE,
-    DINING_ROOM,
-    KITCHEN,
-    BALLROOM,
-    CONSERVATORY,
-    BILLIARD_ROOM,
-    LIBRARY,
-    STUDY;
+    HALL("Hall", new int[][] {{11, 5}, {12, 6}, {13, 6}}),
+    LOUNGE("Lounge", new int[][] {{19, 5}}),
+    DINING_ROOM("Dining Room", new int[][] {{18, 11}, {18, 13}}),
+    KITCHEN("Kitchen", new int[][] {{20, 20}}),
+    BALLROOM("Ballroom", new int[][] {{10, 19}, {15, 19}, {10, 20}, {15, 20}}),
+    CONSERVATORY("Conservatory", new int[][] {{5, 21}}),
+    BILLIARD_ROOM("Billiard Room", new int[][] {{2, 14}, {5, 16}}),
+    LIBRARY("Library", new int[][] {{6, 9}, {4, 10}}),
+    STUDY("Study", new int[][] {{6, 3}}),
+    STAIRCASE("Staircase", new int[][] {{11, 9}, {12, 9}, {13, 9}});
 
-    private Scanner input;
-    
+    private String name;
+    private int[][] entrances;
+
+    Room(String name, int[][] entrances) {
+        this.name = name;
+        this.entrances = entrances;
+    }
+
+    String getName() {
+        return name;
+    }
+
+    int[][] getEntrances() {
+        return entrances;
+    }
 }

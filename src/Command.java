@@ -16,7 +16,11 @@ public enum Command {
     DOWN("down", "Move downwards", "d"),
     LEFT("left", "Move leftwards", "l"),
     RIGHT("right", "Move rightwards", "r"),
-    INVENTORY("inventory", "Open your inventory", "inv");
+    INVENTORY("inventory", "Open your inventory", "inv"),
+    SEARCH("search", "Search around the room you are currently in"),
+    SUBMIT_DNA("submitDNA", "Submit DNA to Detective Joseph to send to the lab for analysis"),
+    SUBMIT_FINGERPRINTS("submitFingerprints", "Submit fingerprints to Detective Joseph to send to the lab for analysis"),
+    REQUEST_CAMERA("requestCamera", "Request security camera footage from the neight of the murder");
 
     private final String name;
     private final String[] aliases;
