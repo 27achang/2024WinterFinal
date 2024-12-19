@@ -454,8 +454,8 @@ public class Simulation {
                 // Determine available room options
                 if (currentRoom != null && currentRoom != Room.STAIRCASE) {
                     options.add(Command.SEARCH);
-                    if (inventory.contains(Item.DNA_COLLECTOR)) options.add(Command.COLLECT_DNA);
-                    if (inventory.contains(Item.FINGERPRINT_COLLECTOR)) options.add(Command.COLLECT_FINGERPRINTS);
+                    if (inventory.contains(Item.DNA_COLLECTOR) && roomOfCollectedDNA == null) options.add(Command.COLLECT_DNA);
+                    if (inventory.contains(Item.FINGERPRINT_COLLECTOR) && roomOfCollectedFingerprints == null) options.add(Command.COLLECT_FINGERPRINTS);
                     if (inventory.contains(Item.UV_SCANNER)) options.add(Command.UV_SCAN);
                 }
             }
@@ -644,6 +644,8 @@ public class Simulation {
         loadingAnimation(1);
         rollingPrint("You've collected DNA from the " + currentRoom.getName().toLowerCase() + ". Submit it to Detective Joseph at the central staircase for analysis.");
         totalDNACollected++;
+        roomOfCollectedDNA = currentRoom;
+        suspectOfCollectedDNA = currentRoom.getDNA();
         textDelay(2000);
     }
 
@@ -652,6 +654,9 @@ public class Simulation {
         if(currentRoom.hasWeapon()) {
             rollingPrint("You found a bloody " + currentRoom.getWeapon().getName().toLowerCase() + " with some finger prints on it in the " + currentRoom.getName().toLowerCase() + "! Submit it to Detective Joseph at the central staircase for analysis.");
             totalFingerprintsCollected++;
+            roomOfCollectedFingerprints = currentRoom;
+            weaponOfCollectedFingerprints = currentRoom.getWeapon();
+            suspectOfCollectedFingerprints = currentRoom.getWeaponFingerprints();
         }
         else{
             double random = Math.random();
@@ -730,10 +735,13 @@ public class Simulation {
         if (answer == Command.YES){
             rollingPrint("Thanks for the donuts! ");
             textDelay();
-            rollingPrint("The clips should be back in about 5 turns. ");
+            String room = promptInput("Which room do you want the footage from? (Hall, Lounge, Dining Room, Kitchen, Ballroom, Conservatory, Billiard Room, Library, Study)", true, "Hall", "Lounge", "Dining Room", "Kitchen", "Ballroom", "Conservatory", "Billiard Room", "Library", "Study");
+            rollingPrint("Alright, the clips should be back in about 5 turns. ");
             textDelay();
             rollingPrint("Nice work, detective.");
             findingCameras = true;
+            roomOfRequestedCameras = Arrays.stream(Room.values()).filter((a) -> room.equals(a.getName())).findFirst().get();
+            suspectOfRequestedCameras = roomOfRequestedCameras.getCameraSubject();
             totalCamerasRequested++;
             numDonuts -= 2;
             totalDonutsEatenByJoseph += 2;
@@ -784,7 +792,7 @@ public class Simulation {
             int random;
             Room room;
             do{
-                random = (int)(Math.random() + 9);
+                random = (int)(Math.random() * 9);
                 room = Room.values()[random];
             } while (room.hasItem());
             room.setItem(item);
@@ -809,7 +817,7 @@ public class Simulation {
      */
     private void placeClues() {
         // Place the weapon
-        int random = (int)(Math.random() + 9);
+        int random = (int)(Math.random() * 9);
         Room room = Room.values()[random];
         room.setWeapon(answerWeapon);
         room.setWeaponFingerprints(answerSuspect);
@@ -1115,8 +1123,12 @@ public class Simulation {
 
             // Print the command options
             for(Command command : commands) {
-                if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
-                else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
+                if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
+                            (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
+                );
+                else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
+                            (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
+                );
             }
         
             // Allow the user to provide input
