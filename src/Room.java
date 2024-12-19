@@ -1,10 +1,8 @@
-import java.util.Scanner;
-
 /**
  * The Room enum type contains functionality for rooms within the game
  * 
  * @author Alexander Chang
- * @version 0.14, 12/13/2024
+ * @version 0.16, 12/19/2024
  */
 public enum Room {
     HALL("Hall", new int[][] {{11, 5}, {12, 6}, {13, 6}}),
@@ -20,10 +18,48 @@ public enum Room {
 
     private String name;
     private int[][] entrances;
+    private Item item;
+    private Weapon weapon;
+    private Suspect weaponFingerprints;
+    private Suspect DNA;
+    private Suspect cameraSubject;
+    private boolean UVCluePresent;
 
     Room(String name, int[][] entrances) {
         this.name = name;
         this.entrances = entrances;
+    }
+
+    void setItem(Item item) {
+        this.item = item;
+    }
+
+    boolean hasItem() {
+        return item != null;
+    }
+
+    void setWeapon(Weapon weapon) {
+        this.weapon = weapon;
+    }
+
+    boolean hasWeapon() {
+        return weapon != null;
+    }
+
+    void setWeaponFingerprints(Suspect weaponFingerprints) {
+        this.weaponFingerprints = weaponFingerprints;
+    }
+
+    void setDNA(Suspect DNA) {
+        this.DNA = DNA;
+    }
+
+    void setCameraSubject(Suspect cameraSubject) {
+        this.cameraSubject = cameraSubject;
+    }
+
+    void setUVCluePresent(boolean UVCluePresent) {
+        this.UVCluePresent = UVCluePresent;
     }
 
     String getName() {
@@ -32,5 +68,34 @@ public enum Room {
 
     int[][] getEntrances() {
         return entrances;
+    }
+
+    Item getItem() {
+        return item;
+    }
+
+    Weapon getWeapon() {
+        return weapon;
+    }
+
+    Suspect getWeaponFingerprints() {
+        return weaponFingerprints;
+    }
+
+    Suspect getDNA() {
+        return DNA;
+    }
+
+    Suspect getCameraSubject() {
+        return cameraSubject;
+    }
+
+    boolean isUVCluePresent() {
+        return UVCluePresent;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

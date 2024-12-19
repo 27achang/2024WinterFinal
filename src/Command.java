@@ -5,22 +5,26 @@ import java.util.Arrays;
  * The enum type also contains simple processing functions for game commands
  * 
  * @author Alexander Chang
- * @version 0.15, 12/16/2024
+ * @version 0.16, 12/19/2024
  */
 public enum Command {
     ABOUT("about", "Learn more about Clue 2.0"),
     BEGIN("begin", "Start the game"),
     YES("yes", "","y"),
     NO("no", "","n"),
-    UP("up", "Move upwards", "u"),
-    DOWN("down", "Move downwards", "d"),
-    LEFT("left", "Move leftwards", "l"),
-    RIGHT("right", "Move rightwards", "r"),
+    UP("up", "Move upwards", "w"),
+    DOWN("down", "Move downwards", "s"),
+    LEFT("left", "Move leftwards", "a"),
+    RIGHT("right", "Move rightwards", "d"),
     INVENTORY("inventory", "Open your inventory", "inv"),
     SEARCH("search", "Search around the room you are currently in"),
-    SUBMIT_DNA("submitDNA", "Submit DNA to Detective Joseph to send to the lab for analysis"),
-    SUBMIT_FINGERPRINTS("submitFingerprints", "Submit fingerprints to Detective Joseph to send to the lab for analysis"),
-    REQUEST_CAMERA("requestCamera", "Request security camera footage from the neight of the murder");
+    COLLECT_DNA("collectdna", "Collect DNA from the room you are currently in"),
+    COLLECT_FINGERPRINTS("collectfingerprints", "Collect fingerprints from the room you are currently in", "fingerprint"),
+    UV_SCAN("uvscan","Use a UV light to scan the room you are currently in for hidden clues"),
+    SUBMIT_DNA("submitdna", "Submit DNA to Detective Joseph to send to the lab for analysis"),
+    SUBMIT_FINGERPRINTS("submitfingerprints", "Submit fingerprints to Detective Joseph to send to the lab for analysis"),
+    REQUEST_CAMERA("requestcamera", "Request security camera footage from the neight of the murder"),
+    ACCUSE("accuse","Report to Detective Joseph who you think committed the murder, with what, and where. One chance only.");
 
     private final String name;
     private final String[] aliases;
