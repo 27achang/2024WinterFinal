@@ -149,15 +149,6 @@ public class Simulation {
     Simulation() {
         input = new Scanner(System.in);
 
-        xPos = 24;
-        yPos = 8;
-        name = "Danny";
-        color = "mustard";
-        selectAnswers();
-        placeItems();
-        placeClues();
-        run();
-
         clearConsole();
 
         if (!pollANSISupport()) return;
