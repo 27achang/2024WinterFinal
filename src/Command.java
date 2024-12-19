@@ -9,16 +9,22 @@ import java.util.Arrays;
  */
 public enum Command {
     ABOUT("about", "Learn more about Clue 2.0"),
-    BEGIN("begin","Start the game"),
-    YES("yes","","y"),
-    NO("no","","n");
+    BEGIN("begin", "Start the game"),
+    YES("yes", "","y"),
+    NO("no", "","n"),
+    UP("up", "Move upwards", "u"),
+    DOWN("down", "Move downwards", "d"),
+    LEFT("left", "Move leftwards", "l"),
+    RIGHT("right", "Move rightwards", "r"),
+    INVENTORY("inventory", "Open your inventory", "inv");
 
     private final String name;
-    private String[] aliases = new String[0];
+    private final String[] aliases;
     private final String description;
 
     Command(String name, String description) {
         this.name = name;
+        this.aliases = new String[0];
         this.description = description;
     }
 

@@ -1,5 +1,6 @@
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * The Simulation class contains the core mechanics of the game including turn actions and prompting for input
@@ -35,16 +36,16 @@ public class Simulation {
     // 2 becomes a space and end of room color
     // 3 becomes a slash and end of room color
     // 4 becomes a backslash and start of room color
-    private final String map = """
+    private static final String map = """
         XXXXXXXXXXXXXXXXXXXXXXXXXX
-        X1    2X XXXXXXXXSX1    2X
+        X1    2X XXXXXXXX X1    2X
         X1    2|  |    |  |1    2X
         X4    2|  |    |  |1    2X
         X------|  |    |  |1    2X
         XX     ^ >|    |  |1    3X
-        XL        |    |  |------X
+        X         |    |  |------X
         XX-----   ------  ^     XX
-        X1    2|    ^^          MX
+        X1    2|    ^^           X
         X1    2|< |1 2|   v     XX
         X1    2|  |1 2|  |-------X
         XX-----   |1 2|  |1     2X
@@ -55,7 +56,7 @@ public class Simulation {
         X1   2|<            -----X
         X-----|   v    v        XX
         XX       |------|   v    X
-        XP       |1    2|  |----XX
+        X        |1    2|  |----XX
         XX---|< >|1    2|< |1   2X
         X1/  2|  |1    2|  |1   2X
         X1   2|  |1    2|  |1   2X
@@ -64,6 +65,34 @@ public class Simulation {
         XXXXXXXXXX XXXX XXXXXXXXXX
         XXXXXXXXXXXXXXXXXXXXXXXXXX""";
 
+    private static final char[][] mapArray = {
+        {' ', ' ', ' ', ' ', ' ', ' ', 'X', ' ', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'S', 'X', ' ', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' '},
+        {'\\', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' '},
+        {'-', '-', '-', '-', '-', '-', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' '},
+        {'X', ' ', ' ', ' ', ' ', ' ', '^', ' ', '>', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', '/'},
+        {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', '-', '-', '-', '-', '-', '-'},
+        {'X', '-', '-', '-', '-', '-', ' ', ' ', ' ', '-', '-', '-', '-', '-', '|', ' ', ' ', '^', ' ', ' ', ' ', ' ', ' ', 'X'},
+        {' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', '^', '^', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', ' ', '|', '<', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', ' ', 'v', ' ', ' ', ' ', ' ', ' ', 'X'},
+        {' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', '|', '-', '-', '-', '-', '-', '-', '-'},
+        {'X', '-', '-', '-', '-', '-', ' ', ' ', ' ', '|', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+        {'X', 'v', ' ', '^', ' ', ' ', ' ', ' ', ' ', '-', '-', '-', '-', '-', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+        {'-', '-', '-', '-', '-', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '>', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', '-', '-', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', '|', '<', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '-', '-', '-', '-', '-'},
+        {'-', '-', '-', '-', '-', '|', ' ', ' ', ' ', 'v', ' ', ' ', ' ', ' ', 'v', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'X'},
+        {'X', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', '-', '-', '-', '-', '-', '-', '|', ' ', ' ', ' ', 'v', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', '-', '-', '-', '-', 'X'},
+        {'X', '-', '-', '-', '|', '<', ' ', '>', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|', '<', ' ', '|', ' ', ' ', ' ', ' ', ' '},
+        {' ', '/', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', '|', ' ', ' ', '|', '-', '-', ' ', ' ', '-', '-', '|', ' ', ' ', '|', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', ' ', 'X', ' ', ' ', ' ', '|', ' ', ' ', '|', ' ', ' ', ' ', 'X', '\\', ' ', ' ', ' ', ' ', ' '},
+        {'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', ' ', 'X', 'X', 'X', 'X', ' ', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X'}
+    };
+
     private Scanner input;
     private boolean gameActive;
     private String name;
@@ -71,8 +100,9 @@ public class Simulation {
     private int stamina = 100;
     private Room[] visitedRooms;
     private Room currentRoom;
-    private int x_pos; // Starting at 1
-    private int y_pos; // Starting at 1
+    private Item[] inventory;
+    private int xPos; // Starting at 1
+    private int yPos; // Starting at 1
 
     Simulation() {
         input = new Scanner(System.in);
@@ -107,7 +137,6 @@ public class Simulation {
      * Provide a user-guided test to determine whether the user is using a console that supports ANSI escape codes.
      */
     private boolean pollANSISupport() {
-        printMap();
         System.out.println("""
             -----------------------------------------
               ANSI Escape Code Support Confirmation
@@ -268,6 +297,43 @@ public class Simulation {
         rollingPrint("To begin, press enter.");
         input.nextLine();
 
+        switch (color) {
+            case "scarlet":
+                xPos = 17;
+                yPos = 1;
+                break;
+            
+            case "mustard":
+                xPos = 24;
+                yPos = 8;
+                break;
+
+            case "white":
+                xPos = 15;
+                yPos = 25;
+                break;
+            
+            case "green":
+                xPos = 10;
+                yPos = 25;
+                break;
+            
+            case "blue":
+                xPos = 1;
+                yPos = 19;
+                break;
+            
+            case "plum":
+                xPos = 1;
+                yPos = 6;
+                break;
+
+            default:
+                xPos = 8;
+                yPos = 1;
+                break;
+        }
+
         // Begins the actual text adventure
         run();
     }
@@ -278,7 +344,23 @@ public class Simulation {
     private void run() {
         gameActive = true;
         while (gameActive) {
-            
+            printMap();
+            // U+0008 is backspace
+            // Determine the actions available to the user
+            ArrayList<Command> options = new ArrayList<>();
+            if (currentRoom == null) {
+                // Determine up down left right
+                char currentCell = mapArray[yPos - 1][xPos - 1];
+                char aboveCell = (yPos == 1 ? ' ' : mapArray[yPos - 2][xPos - 1]);
+                char belowCell = (yPos == 25 ? ' ' : mapArray[yPos][xPos - 1]);
+                char leftCell = (xPos == 1 ? ' ' : mapArray[yPos - 1][xPos - 2]);
+                char rightCell = (xPos == 24 ? ' ' : mapArray[yPos - 1][xPos]);
+                if (yPos != 1 && (currentCell == '^' || (aboveCell != '|' && aboveCell != '-' && aboveCell != 'X'))) options.add(Command.UP);
+                else if (yPos != 25 && (currentCell == 'v' || (belowCell != '|' && belowCell != '-' && belowCell != 'X'))) options.add(Command.DOWN);
+                else if (xPos != 1 && (currentCell == '<' || (leftCell != '|' && leftCell != '-' && leftCell != 'X'))) options.add(Command.LEFT);
+                else if (xPos != 24 && (currentCell == '>' || (rightCell != '|' && rightCell != '-' && rightCell != 'X'))) options.add(Command.RIGHT);
+                Command action = promptInput("So, detective, what do you want to do?", true, options);
+            }
         }
     }
 
@@ -427,9 +509,11 @@ public class Simulation {
          * XXXXXXXXXXXXXXXXXXXXXXXXXX
          */
         for (int i = 0; i < map.length(); i++) {
-            switch (map.charAt(i)) {
+            if (i == 27 * yPos + xPos) System.out.print(ANSI_WHITE_BACKGROUND + " " + ANSI_RESET);
+            else switch (map.charAt(i)) {
                 case 'X':
-                    System.out.print(ANSI_RED_BACKGROUND + " " + ANSI_RESET);
+                    System.out.print(ANSI_RED_BACKGROUND + " ");
+                    if(i == map.length() - 1 || map.charAt(i + 1) != 'X') System.out.print(ANSI_RESET);
                     break;
                 
                 case '1':
@@ -453,6 +537,7 @@ public class Simulation {
                     break;
             }
         }
+        System.out.println();
     }
 
     /**
@@ -467,14 +552,17 @@ public class Simulation {
         ArrayList<String> acceptedCommands = new ArrayList<>();
 
         // Print the user prompt
-        if (rolling) rollingPrintln(message);
-        else System.out.println(message);
+        rollingPrintln(message);
 
         // Print the command options and update the list of accepted commands (including aliases)
         // This list will be used to validate the input
         for (Command command : commands) {
-            if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
-            else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
+            if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
+                            (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
+            );
+            else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
+                            (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
+            );
             acceptedCommands.add(command.getName());
             if(command.containsAliases()) Arrays.stream(command.getAliases()).forEach((alias) -> acceptedCommands.add(alias));
         }
@@ -488,13 +576,9 @@ public class Simulation {
             clearConsole();
 
             // Print the user prompt
-            if (rolling){
-                rollingPrintln("You can't do that right now.");
-                rollingPrintln(message);
-            } else {
-                System.out.println("You can't do that right now.");
-                System.out.println(message);
-            }
+            if (rolling) rollingPrintln("You can't do that right now.");
+            else System.out.println("You can't do that right now.");
+            rollingPrintln(message);
 
             // Print the command options
             for(Command command : commands) {
@@ -508,6 +592,60 @@ public class Simulation {
         }
         final String finalAnswer = answer;
         return ((Command)(Arrays.stream(commands).filter((a) -> a.matches(finalAnswer)).toArray()[0]));
+    }
+
+    /**
+     * Prompts the user for input with a choice from the given commands and with rolling printing if {@code rolling} is true
+     * 
+     * @param message the message with which to prompt the user
+     * @param rolling whether the print to system output should be rolling
+     * @param commands the commands to list and accept as valid input
+     * @return the command selected by the user
+     */
+    public Command promptInput(String message, boolean rolling, ArrayList<Command> commands) {
+        ArrayList<String> acceptedCommands = new ArrayList<>();
+
+        // Print the user prompt
+        rollingPrintln(message);
+
+        // Print the command options and update the list of accepted commands (including aliases)
+        // This list will be used to validate the input
+        for (Command command : commands) {
+            if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
+                            (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
+            );
+            else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
+                            (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
+            );
+            acceptedCommands.add(command.getName());
+            if(command.containsAliases()) Arrays.stream(command.getAliases()).forEach((alias) -> acceptedCommands.add(alias));
+        }
+        
+        // Allow the user to provide input
+        System.out.print("> ");
+        String answer = input.nextLine().toLowerCase();
+
+        // If the input is not a recognized command or alias, clear the console and prompt the user again.
+        while (!acceptedCommands.contains(answer)) {
+            clearConsole();
+
+            // Print the user prompt
+            if (rolling) rollingPrintln("You can't do that right now.");
+            else System.out.println("You can't do that right now.");
+            rollingPrintln(message);
+
+            // Print the command options
+            for(Command command : commands) {
+                if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
+                else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
+            }
+        
+            // Allow the user to provide input
+            System.out.print("> ");
+            answer = input.nextLine().toLowerCase();
+        }
+        final String finalAnswer = answer;
+        return ((Command)(Arrays.stream(commands.toArray()).filter((a) -> ((Command) a).matches(finalAnswer)).toArray()[0]));
     }
 
     /**
