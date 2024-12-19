@@ -5,17 +5,18 @@ import java.util.Arrays;
  * The enum type also contains simple processing functions for game commands
  * 
  * @author Alexander Chang
- * @version 0.16, 12/19/2024
+ * @version 1.00, 12/19/2024
  */
 public enum Command {
     ABOUT("about", "Learn more about Clue 2.0"),
-    BEGIN("begin", "Start the game"),
+    BEGIN("begin", "Start the game", "start"),
     YES("yes", "","y"),
     NO("no", "","n"),
     UP("up", "Move upwards", "w"),
     DOWN("down", "Move downwards", "s"),
     LEFT("left", "Move leftwards", "a"),
     RIGHT("right", "Move rightwards", "d"),
+    PASS("pass", "Pass through the secret pathway to the room at the opposite corner of the mansion."),
     INVENTORY("inventory", "Open your inventory", "inv"),
     SEARCH("search", "Search around the room you are currently in"),
     COLLECT_DNA("collectdna", "Collect DNA from the room you are currently in"),

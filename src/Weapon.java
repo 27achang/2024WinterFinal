@@ -2,7 +2,7 @@
  * The Weapon enum type contains the possible weapons used in the murder
  * 
  * @author Alexander Chang
- * @version 0.16, 12/19/2024
+ * @version 1.00, 12/19/2024
  */
 public enum Weapon {
     CANDLESTICK("Candlestick"),

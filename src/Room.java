@@ -2,7 +2,7 @@
  * The Room enum type contains functionality for rooms within the game
  * 
  * @author Alexander Chang
- * @version 0.16, 12/19/2024
+ * @version 1.00, 12/19/2024
  */
 public enum Room {
     HALL("Hall", new int[][] {{11, 5}, {12, 6}, {13, 6}}),
