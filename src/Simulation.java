@@ -364,6 +364,16 @@ public class Simulation {
         System.out.println();
         textDelay(5000);
         
+        // Provide the user key game tips
+        System.out.println("""
+            ========================================== KEY GAME TIPS ==========================================
+             Press enter to exit results and dialogue screens.
+             Don't rush through. Keep an eye out for your lab results.
+             Analyze samples you collect with Detective Joseph. Not everything is free. What would a cop want?
+             Keep track of the clues you have collected. There is no way to go back.
+            ===================================================================================================
+            """);
+        
         rollingPrint("To begin, press enter.");
         input.nextLine();
 
