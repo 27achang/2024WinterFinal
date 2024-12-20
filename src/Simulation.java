@@ -607,7 +607,7 @@ public class Simulation {
             if (labScanningFingerprints && action != Command.SUBMIT_FINGERPRINTS) turnsSinceFingerprintsSubmitted++;
             if (findingCameras && action != Command.REQUEST_CAMERA) turnsSinceCamerasRequested++;
 
-            if (turns > 250) {
+            if (actionableTurns > 250) {
                 gameActive = false;
                 tookTooLong = true;
             }
@@ -1245,7 +1245,8 @@ public class Simulation {
 
         // Print the command options and update the list of accepted commands (including aliases)
         // This list will be used to validate the input
-        for (Command command : commands) {
+        for (int i = 0; i < commands.size(); i++) {
+            Command command = (Command) commands.get(i);
             if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
                             (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
             );
@@ -1267,7 +1268,7 @@ public class Simulation {
             // Print the user prompt
             if (rolling) rollingPrintln("You can't do that right now.");
             else System.out.println("You can't do that right now.");
-            System.out.println()
+            System.out.println();
             printMap();
             rollingPrintln(message);
 
