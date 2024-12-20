@@ -228,7 +228,7 @@ public class Simulation {
         clearConsole();
 
         // Tell the user about Clue 2.0
-        rollingPrintln("This project attempts to recreate the classic mystery game Clue, adding more modern features and items. This project was completed in its entirety by Alexander Chang. Unathorized reproduction " +
+        rollingPrintln("This project attempts to recreate the classic mystery game Clue, adding more modern features and items. This project was completed in its entirety by Alexander Chang. Unauthorized reproduction " +
             ANSI_WHITE_BACKGROUND + ANSI_BLACK + " or distribution " + ANSI_RESET + """
              of this project is prohibited by law.
             (c) 2024 by Alexander Chang. All rights reserved."""
@@ -270,7 +270,7 @@ public class Simulation {
 
         System.out.println();
         System.out.println();
-        rollingPrint("Thomson was killed in his mansion just last night and the mystery killer's been on the run since. ");
+        rollingPrint("Thompson was killed in his mansion just last night and the mystery killer's been on the run since. ");
         textDelay();
         rollingPrint("We need your help in solving this mystery.");
         textDelay(1000);
@@ -655,6 +655,8 @@ public class Simulation {
         textDelay(2000);
         System.out.println();
         System.out.println();
+        rollingPrintln(" Final inventory: " + inventory.stream().map(Item::getName).collect(Collectors.joining(", ")));
+        rollingPrintln("   Rooms visited: " + visitedRooms.stream().map(Room::getName).collect(Collectors.joining(", ")));
         System.out.println("-------------------------------------------" + (turns >= 10 ? "-" : "") + (turns >= 100 ? "-" : ""));
         rollingPrintln("                            Turns taken: " + turns);
         rollingPrintln("                     Total donuts found: " + totalDonutsFound);
