@@ -107,6 +107,7 @@ public class Simulation {
     private boolean solvedMystery;
     private boolean tookTooLong;
 
+    private int actionableTurns;
     private int turns;
     private int turnsSinceLastDonutFound; // Only donuts found in the kitchen
     
@@ -122,11 +123,16 @@ public class Simulation {
     private Weapon weaponOfCollectedFingerprints;
     private Suspect suspectOfCollectedFingerprints;
     private boolean labScanningFingerprints;
+    private Room roomOfLabFingerprints;
+    private Weapon weaponOfLabFingerprints;
+    private Suspect suspectOfLabFingerprints;
     private int turnsSinceFingerprintsSubmitted;
 
     private Room roomOfCollectedDNA;
     private Suspect suspectOfCollectedDNA;
     private boolean labScanningDNA;
+    private Room roomOfLabDNA;
+    private Suspect suspectOfLabDNA;
     private int turnsSinceDNASubmitted;
     
     private Room roomOfRequestedCameras;
@@ -203,7 +209,7 @@ public class Simulation {
         String answer;
         do {
             clearConsole();
-            for (int i = 1; i <= 38 - 4; i++) {
+            for (int i = 1; i <= 39 - 4; i++) {
                 System.out.println(i);
             }
             rollingPrintln("Please ensure all the above numbers and this and following lines are visible on your terminal window.");
@@ -345,9 +351,9 @@ public class Simulation {
         textDelay();
         rollingPrint("If at any point you need to reach me or can't manage the investigation any longer for whatever reason, I'll be right at the base of the central staircase with the media. ");
         textDelay();
-        rollingPrint("Remember, ");
+        rollingPrint("It'd be to your advantage to take notes on the clues you find and remember, ");
         textDelay(250);
-        rollingPrint("time is of the essence.");
+        rollingPrint(ANSI_WHITE_BACKGROUND + ANSI_BLACK + " time is of the essence. " + ANSI_RESET);
         textDelay();
         System.out.println();
         System.out.println();
@@ -414,23 +420,22 @@ public class Simulation {
         gameActive = true;
         while (gameActive) {
             clearConsole();
-            printMap();
 
-            // Deliver lab and camera results.
+            // Deliver lab and camera results
             if (labScanningDNA && turnsSinceDNASubmitted == 5) {
                 System.out.println("===== Lab Results =====");
-                rollingPrintln("The DNA you collected from the " + roomOfCollectedDNA.getName().toLowerCase() + (suspectOfCollectedDNA != null ? " was identified as that of " + suspectOfCollectedDNA.getName() + "." : " could not be identified."));
+                rollingPrintln("The DNA you collected from the " + roomOfLabDNA.getName().toLowerCase() + (suspectOfLabDNA != null ? " was identified as that of " + suspectOfLabDNA.getName() + "." : " could not be identified."));
                 System.out.println("=======================");
-                roomOfCollectedDNA = null;
-                suspectOfCollectedDNA = null;
+                roomOfLabDNA = null;
+                suspectOfLabDNA = null;
                 labScanningDNA = false;
             } else if (labScanningFingerprints && turnsSinceFingerprintsSubmitted == 5) {
                 System.out.println("===== Lab Results =====");
-                rollingPrintln("The fingerprints you collected from the " + weaponOfCollectedFingerprints.getName().toLowerCase() + " in the " + roomOfCollectedFingerprints.getName().toLowerCase() + " were identified as those of " + suspectOfCollectedFingerprints.getName() + ".");
+                rollingPrintln("The fingerprints you collected from the " + weaponOfLabFingerprints.getName().toLowerCase() + " in the " + roomOfLabFingerprints.getName().toLowerCase() + " were identified as those of " + suspectOfLabFingerprints.getName() + ".");
                 System.out.println("=======================");
-                roomOfCollectedFingerprints = null;
-                weaponOfCollectedFingerprints = null;
-                suspectOfCollectedFingerprints = null;
+                roomOfLabFingerprints = null;
+                weaponOfLabFingerprints = null;
+                suspectOfLabFingerprints = null;
                 labScanningFingerprints = false;
             } else if (findingCameras && turnsSinceCamerasRequested == 5) {
                 System.out.println("===== Camera Results =====");
@@ -486,7 +491,7 @@ public class Simulation {
             if (inventory.size() > 0 || numDonuts > 0) options.add(Command.INVENTORY);
 
             // Prompt the user to choose from the available options
-            Command action = promptInput("So, detective, what do you want to do?", false, options);
+            Command action = promptInputWithMap("So, detective, what do you want to do?", false, options);
             // If the user is trying to use a secret passageway, process the action.
             if (action == Command.PASS) {
                 // Top left to bottom right
@@ -595,6 +600,7 @@ public class Simulation {
             } catch (NoSuchElementException e) {}
 
             // Increment the turns counters
+            if(action != Command.INVENTORY) actionableTurns++;
             turns++;
             if (totalDonutsFound > 0) turnsSinceLastDonutFound++;
             if (labScanningDNA && action != Command.SUBMIT_DNA) turnsSinceDNASubmitted++;
@@ -612,12 +618,13 @@ public class Simulation {
             textDelay();
             rollingPrint("The suspects most likely out of the country and out of our control by now. ");
             textDelay();
-            rollingPrintln("Better luck next time.");
+            rollingPrint("Better luck next time.");
         } else {
             rollingPrint("Ready to find out together whether you were right, detective? ");
             textDelay();
             rollingPrint("When you're ready, press enter and we'll find out.");
             input.nextLine();
+            System.out.println();
             rollingPrintln("         Your Guess      | Correct Answer");
             rollingPrint("Suspect: " + guessedSuspect + (new String(new char[15 - guessedSuspect.length()]).replace("\0", " ")) + " | ");
             textDelay();
@@ -630,20 +637,24 @@ public class Simulation {
             rollingPrint("   Room: " + guessedRoom + (new String(new char[15 - guessedRoom.length()]).replace("\0", " ")) + " | ");
             textDelay();
             rollingPrintln((guessedRoom.equals(answerRoom.getName()) ? ANSI_GREEN_BACKGROUND : ANSI_RED_BACKGROUND) + answerRoom + (new String(new char[15 - answerRoom.getName().length()]).replace("\0", " ")) + ANSI_RESET);
+            System.out.println();
             if (solvedMystery) {
-                rollingPrintln("Very nicely done, detective " + name + "! I'm glad I could trust you.");
+                rollingPrint("Very nicely done, detective " + name + "! I'm glad I could trust you.");
             } else if (
                 (suspectCorrect && weaponCorrect) ||
                 (weaponCorrect && roomCorrect) ||
                 (suspectCorrect && roomCorrect)
             ) {
-                rollingPrintln("Nearly there, detective " + name + "! I'm sure you'll get it next time.");
+                rollingPrint("Nearly there, detective " + name + "! I'm sure you'll get it next time.");
             } else if (suspectCorrect || weaponCorrect || roomCorrect) {
-                rollingPrintln("Well done on the " + (suspectCorrect ? "suspect" : (weaponCorrect ? "weapon" : "room")) + ". Better luck with the others next time.");
+                rollingPrint("Well done on the " + (suspectCorrect ? "suspect" : (weaponCorrect ? "weapon" : "room")) + ". Better luck with the others next time.");
             } else {
-                rollingPrintln("Better luck next time, detective.");
+                rollingPrint("Better luck next time, detective.");
             }
         }
+        textDelay(2000);
+        System.out.println();
+        System.out.println();
         System.out.println("-------------------------------------------" + (turns >= 10 ? "-" : "") + (turns >= 100 ? "-" : ""));
         rollingPrintln("                            Turns taken: " + turns);
         rollingPrintln("                     Total donuts found: " + totalDonutsFound);
@@ -671,32 +682,22 @@ public class Simulation {
          * 
          * Other Rooms:
          *  No items left to find:
-         *   99% Nothing found
-         *   1% 1 donut
-         *  Otherwise:
-         *   55% Nothing found
-         *   15% Fingerprint collector
-         *   15% DNA collector
-         *   15% UV scanner
+         *   95% Nothing found
+         *   5% 1 donut
          */
         double random = Math.random();
-        if (currentRoom == Room.KITCHEN) {
+        if (currentRoom.hasItem() && !(inventory.contains(currentRoom.getItem()))) {
+            getItem(currentRoom.getItem());
+        } else if (currentRoom == Room.KITCHEN) {
             if ((totalDonutsFound > 0 && turnsSinceLastDonutFound < 10 + 1) || random < 0.2) rollingPrint("You found nothing!");
             else if (random < 0.3) getDonuts(1);
             else if (random <= 0.8) getDonuts(2);
             else if (random <= 0.95) getDonuts(3);
             else if (random <= 0.99) getDonuts(4);
             else getDonuts(5);
-        } else {
-            if (inventory.contains(Item.FINGERPRINT_COLLECTOR) && inventory.contains(Item.DNA_COLLECTOR) && inventory.contains(Item.UV_SCANNER)) {
-                if (random < 0.99) rollingPrint("You found nothing!");
-                else getDonuts(1);
-            } else {
-                if (currentRoom.hasItem()) getItem(currentRoom.getItem());
-                else rollingPrint("You found nothing!");
-            }
-        }
-        textDelay(2000);
+        } else if (random < 0.05) getDonuts(1);
+        else rollingPrint("You found nothing!");
+        input.nextLine();
     }
 
     private void getDonuts(int numFound) {
@@ -713,19 +714,22 @@ public class Simulation {
 
     private void collectDNA() {
         loadingAnimation(1);
-        rollingPrint("You've collected DNA from the " + currentRoom.getName().toLowerCase() + ". ");
-        textDelay();
-        rollingPrint("Submit it to Detective Joseph at the central staircase for analysis.");
-        totalDNACollected++;
-        roomOfCollectedDNA = currentRoom;
-        suspectOfCollectedDNA = currentRoom.getDNA();
-        textDelay(2000);
+        // 30% chance you can still find DNA if it is not relevant to the case
+        if (currentRoom.getDNA() != null || Math.random() < 0.3) {
+            rollingPrint("You've collected DNA from the " + currentRoom.getName().toLowerCase() + ". ");
+            textDelay();
+            rollingPrint("Submit it to Detective Joseph at the central staircase for analysis.");
+            totalDNACollected++;
+            roomOfCollectedDNA = currentRoom;
+            suspectOfCollectedDNA = currentRoom.getDNA();
+        } else rollingPrint("You struggled to find anything to collect DNA from in the " + currentRoom.getName().toLowerCase() + ".");
+        input.nextLine();
     }
 
     private void collectFingerprints() {
         loadingAnimation(1);
         if(currentRoom.hasWeapon()) {
-            rollingPrint("You found a bloody " + currentRoom.getWeapon().getName().toLowerCase() + " with some finger prints on it in the " + currentRoom.getName().toLowerCase() + "! ");
+            rollingPrint("You found a bloody " + currentRoom.getWeapon().getName().toLowerCase() + " with some fingerprints on it in the " + currentRoom.getName().toLowerCase() + "! ");
             textDelay();
             rollingPrint("Submit it to Detective Joseph at the central staircase for analysis.");
             totalFingerprintsCollected++;
@@ -738,7 +742,7 @@ public class Simulation {
             if(random < 0.5) rollingPrint("You struggled to find any fingerprints in the " + currentRoom.getName().toLowerCase() + ".");
             else rollingPrint("You found some weak fingerprints in the corner of the " + currentRoom.getName().toLowerCase() + " but struggled to collect them.");
         }
-        textDelay(2000);
+        input.nextLine();
     }
 
     private void scanUV() {
@@ -752,7 +756,7 @@ public class Simulation {
             if(random < 0.5) rollingPrint("You thought you saw something on the wall of the " + currentRoom.getName().toLowerCase() + ", but it turned out to be a fluke.");
             else rollingPrint("You didn't see a thing when you turned on your UV light in the " + currentRoom.getName().toLowerCase() + ".");
         }
-        textDelay(2000);
+        input.nextLine();
     }
 
     private void submitDNA() {
@@ -769,6 +773,10 @@ public class Simulation {
             textDelay();
             rollingPrint("Nice work, detective.");
             labScanningDNA = true;
+            suspectOfLabDNA = suspectOfCollectedDNA;
+            roomOfLabDNA = roomOfCollectedDNA;
+            suspectOfCollectedDNA = null;
+            roomOfCollectedDNA = null;
             totalDNAAnalyzed++;
             numDonuts -= 2;
             totalDonutsEatenByJoseph += 2;
@@ -777,7 +785,7 @@ public class Simulation {
             textDelay();
             rollingPrint("If you bring me two donuts next time, I'll be sure to send it to scan right away.");
         }
-        textDelay(2000);
+        input.nextLine();
     }
 
     private void submitFingerprints() {
@@ -792,6 +800,12 @@ public class Simulation {
             textDelay();
             rollingPrint("Nice work, detective.");
             labScanningFingerprints = true;
+            roomOfLabFingerprints = roomOfCollectedFingerprints;
+            weaponOfLabFingerprints = weaponOfCollectedFingerprints;
+            suspectOfLabFingerprints = suspectOfCollectedFingerprints;
+            roomOfCollectedFingerprints = null;
+            weaponOfCollectedFingerprints = null;
+            suspectOfCollectedFingerprints = null;
             totalFingerprintsAnalyzed++;
             numDonuts -= 2;
             totalDonutsEatenByJoseph += 2;
@@ -800,7 +814,7 @@ public class Simulation {
             textDelay();
             rollingPrint("If you do happen to have two donuts for me next time, I'll be sure to send it to the lab on the double.");
         }
-        textDelay(2000);
+        input.nextLine();
     }
 
     private void requestCamera() {
@@ -830,7 +844,7 @@ public class Simulation {
             textDelay();
             rollingPrint("If you do happen upon some extra, I'd be happy to take them off your hands and find you the footage you need.");
         }
-        textDelay(2000);
+        input.nextLine();
     }
 
     private boolean accuse() {
@@ -903,8 +917,8 @@ public class Simulation {
         // Place the camera sighting
         answerRoom.setCameraSubject(answerSuspect);
 
-        // Place the UV clue (50/50 chance one is placed)
-        answerRoom.setUVCluePresent(Math.random() < 0.5);
+        // Place the UV clue (75% chance one is placed)
+        answerRoom.setUVCluePresent(Math.random() < 0.75);
     }
     
     /**
@@ -1194,6 +1208,67 @@ public class Simulation {
             // Print the user prompt
             if (rolling) rollingPrintln("You can't do that right now.");
             else System.out.println("You can't do that right now.");
+            rollingPrintln(message);
+
+            // Print the command options
+            for(Command command : commands) {
+                if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
+                            (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
+                );
+                else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
+                            (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
+                );
+            }
+        
+            // Allow the user to provide input
+            System.out.print("> ");
+            answer = input.nextLine().toLowerCase();
+        }
+        final String finalAnswer = answer;
+        return ((Command)(Arrays.stream(commands.toArray()).filter((a) -> ((Command) a).matches(finalAnswer)).toArray()[0]));
+    }
+
+    /**
+     * Prints the map and prompts the user for input with a choice from the given commands and with rolling printing if {@code rolling} is true
+     * 
+     * @param message the message with which to prompt the user
+     * @param rolling whether the print to system output should be rolling
+     * @param commands the commands to list and accept as valid input
+     * @return the command selected by the user
+     */
+    public Command promptInputWithMap(String message, boolean rolling, ArrayList<Command> commands) {
+        printMap();
+        ArrayList<String> acceptedCommands = new ArrayList<>();
+
+        // Print the user prompt
+        rollingPrintln(message);
+
+        // Print the command options and update the list of accepted commands (including aliases)
+        // This list will be used to validate the input
+        for (Command command : commands) {
+            if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
+                            (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
+            );
+            else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
+                            (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
+            );
+            acceptedCommands.add(command.getName());
+            if(command.containsAliases()) Arrays.stream(command.getAliases()).forEach((alias) -> acceptedCommands.add(alias));
+        }
+        
+        // Allow the user to provide input
+        System.out.print("> ");
+        String answer = input.nextLine().toLowerCase();
+
+        // If the input is not a recognized command or alias, clear the console and prompt the user again.
+        while (!acceptedCommands.contains(answer)) {
+            clearConsole();
+
+            // Print the user prompt
+            if (rolling) rollingPrintln("You can't do that right now.");
+            else System.out.println("You can't do that right now.");
+            System.out.println()
+            printMap();
             rollingPrintln(message);
 
             // Print the command options
