@@ -373,6 +373,8 @@ public class Simulation {
              Keep track of the clues you have collected. There is no way to go back.
             ===================================================================================================
             """);
+
+        textDelay();        
         
         rollingPrint("To begin, press enter.");
         input.nextLine();
@@ -473,8 +475,8 @@ public class Simulation {
                         if (roomOfCollectedDNA != null) options.add(Command.SUBMIT_DNA);
                         if (roomOfCollectedFingerprints != null) options.add(Command.SUBMIT_FINGERPRINTS);
                     }
-                    if (!findingCameras) options.add(Command.REQUEST_CAMERA);
                 }
+                if (!findingCameras && numDonuts >= 1) options.add(Command.REQUEST_CAMERA);
                 options.add(Command.ACCUSE);
 
             } else {
@@ -666,7 +668,7 @@ public class Simulation {
         System.out.println();
         System.out.println();
         rollingPrintln(" Final inventory: " + inventory.stream().map(Item::getName).collect(Collectors.joining(", ")));
-        rollingPrintln("   Rooms visited: " + visitedRooms.stream().map(Room::getName).collect(Collectors.joining(", ")));
+        rollingPrintln("   Rooms visited: " + visitedRooms.stream().map(Room::getName).filter((a) -> !a.equals("Staircase")).collect(Collectors.joining(", ")));
         System.out.println("-------------------------------------------" + (turns >= 10 ? "-" : "") + (turns >= 100 ? "-" : ""));
         rollingPrintln("                            Turns taken: " + turns);
         rollingPrintln("                     Total donuts found: " + totalDonutsFound);
@@ -847,8 +849,8 @@ public class Simulation {
             roomOfRequestedCameras = Arrays.stream(Room.values()).filter((a) -> room.equals(a.getName())).findFirst().get();
             suspectOfRequestedCameras = roomOfRequestedCameras.getCameraSubject();
             totalCamerasRequested++;
-            numDonuts -= 2;
-            totalDonutsEatenByJoseph += 2;
+            numDonuts--;
+            totalDonutsEatenByJoseph++;
         } else {
             rollingPrint("You don't? ");
             textDelay();

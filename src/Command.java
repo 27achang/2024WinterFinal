@@ -24,7 +24,7 @@ public enum Command {
     UV_SCAN("uvscan","Use a UV light to scan the room you are currently in for hidden clues"),
     SUBMIT_DNA("submitdna", "Submit DNA to Detective Joseph to send to the lab for analysis"),
     SUBMIT_FINGERPRINTS("submitfingerprints", "Submit fingerprints to Detective Joseph to send to the lab for analysis"),
-    REQUEST_CAMERA("requestcamera", "Request security camera footage from the neight of the murder"),
+    REQUEST_CAMERA("requestcamera", "Request security camera footage from the night of the murder"),
     ACCUSE("accuse","Report to Detective Joseph who you think committed the murder, with what, and where. One chance only.");
 
     private final String name;
