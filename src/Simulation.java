@@ -365,14 +365,12 @@ public class Simulation {
         textDelay(5000);
         
         // Provide the user key game tips
-        System.out.println("""
-            ========================================== KEY GAME TIPS ==========================================
-             Press enter to exit results and dialogue screens.
-             Don't rush through. Keep an eye out for your lab results.
-             Analyze samples you collect with Detective Joseph. Not everything is free. What would a cop want?
-             Keep track of the clues you have collected. There is no way to go back.
-            ===================================================================================================
-            """);
+        System.out.println("========================================== KEY GAME TIPS ==========================================");
+        rollingPrintln(" Press enter to exit results and dialogue screens.");
+        rollingPrintln(" Don't rush through. Keep an eye out for your lab results.");
+        rollingPrintln(" Analyze samples you collect with Detective Joseph. Not everything is free. What would a cop want?");
+        rollingPrintln(" Keep track of the clues you have collected. There is no way to go back.");
+        System.out.println("===================================================================================================");
 
         textDelay();        
         
