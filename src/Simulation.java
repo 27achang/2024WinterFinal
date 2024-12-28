@@ -437,6 +437,13 @@ public class Simulation {
                 System.out.println("===== Lab Results =====");
                 rollingPrintln("The DNA you collected from the " + roomOfLabDNA.getName().toLowerCase() + (suspectOfLabDNA != null ? " was identified as that of " + suspectOfLabDNA.getName() + "." : " could not be identified."));
                 System.out.println("=======================");
+                String answer;
+                do {
+                    System.out.println();
+                    rollingPrintln("To acknowledge these results, please type ok below and then press enter.");
+                    System.out.print("> ");
+                    answer = input.nextLine();
+                } while (!answer.toLowerCase().equals("ok"));
                 roomOfLabDNA = null;
                 suspectOfLabDNA = null;
                 labScanningDNA = false;
@@ -444,6 +451,13 @@ public class Simulation {
                 System.out.println("===== Lab Results =====");
                 rollingPrintln("The fingerprints you collected from the " + weaponOfLabFingerprints.getName().toLowerCase() + " in the " + roomOfLabFingerprints.getName().toLowerCase() + " were identified as those of " + suspectOfLabFingerprints.getName() + ".");
                 System.out.println("=======================");
+                String answer;
+                do {
+                    System.out.println();
+                    rollingPrintln("To acknowledge these results, please type ok below and then press enter.");
+                    System.out.print("> ");
+                    answer = input.nextLine();
+                } while (!answer.toLowerCase().equals("ok"));
                 roomOfLabFingerprints = null;
                 weaponOfLabFingerprints = null;
                 suspectOfLabFingerprints = null;
@@ -458,6 +472,13 @@ public class Simulation {
                 else if (random < 0.8) rollingPrint(" sneaking across the opposite wall.");
                 else if (random < 1) rollingPrint(" hunched over something.");
                 System.out.println("==========================");
+                String answer;
+                do {
+                    System.out.println();
+                    rollingPrintln("To acknowledge these results, please type ok below and then press enter.");
+                    System.out.print("> ");
+                    answer = input.nextLine();
+                } while (!answer.toLowerCase().equals("ok"));
                 roomOfRequestedCameras = null;
                 suspectOfRequestedCameras = null;
                 findingCameras = false;
