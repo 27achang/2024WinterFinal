@@ -111,6 +111,7 @@ public class Simulation {
     private int turns;
     private int turnsSinceLastDonutFound; // Only donuts found in the kitchen
     
+    private int totalRoomSearches;
     private int totalFingerprintsCollected;
     private int totalFingerprintsAnalyzed;
     private int totalDNACollected;
@@ -670,6 +671,7 @@ public class Simulation {
         System.out.println("-------------------------------------------" + (turns >= 10 ? "-" : "") + (turns >= 100 ? "-" : ""));
         rollingPrintln("                            Turns taken: " + turns);
         rollingPrintln("                     Total donuts found: " + totalDonutsFound);
+        rollingPrintln("                    Total room searches: " + totalRoomSearches);
         rollingPrintln("           Total fingerprints collected: " + totalFingerprintsCollected);
         rollingPrintln("            Total fingerprints analyzed: " + totalFingerprintsAnalyzed);
         rollingPrintln("            Total DNA samples collected: " + totalDNACollected);
@@ -682,21 +684,7 @@ public class Simulation {
 
     private void searchRoom() {
         loadingAnimation(1);
-        /*
-         * Kitchen:
-         *  On 5th turn after last donut finding:
-         *   30% Nothing found
-         *   40% 1 donut
-         *   50% 2 donuts
-         *   15% 3 donuts
-         *   4% 4 donuts
-         *   1% 5 donuts
-         * 
-         * Other Rooms:
-         *  No items left to find:
-         *   95% Nothing found
-         *   5% 1 donut
-         */
+        totalRoomSearches++;
         double random = Math.random();
         if (currentRoom.hasItem() && !(inventory.contains(currentRoom.getItem()))) {
             getItem(currentRoom.getItem());
