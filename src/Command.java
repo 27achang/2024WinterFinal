@@ -5,7 +5,7 @@ import java.util.Arrays;
  * The enum type also contains simple processing functions for game commands
  * 
  * @author Alexander Chang
- * @version 1.00, 12/19/2024
+ * @version 1.01, 12/29/2024
  */
 public enum Command {
     ABOUT("about", "Learn more about Clue 2.0"),

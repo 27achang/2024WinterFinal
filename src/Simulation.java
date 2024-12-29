@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
  * The Simulation class contains the core mechanics of the game including turn actions and prompting for input
  * 
  * @author Alexander Chang
- * @version 1.00, 12/19/2024
+ * @version 1.01, 12/29/2024
  */
 public class Simulation {
     // ANSI COLOR CODES
@@ -209,7 +209,7 @@ public class Simulation {
             for (int i = 1; i <= 39 - 4; i++) {
                 System.out.println(i);
             }
-            rollingPrintln("Please ensure all the above numbers and this and following lines are visible on your terminal window.");
+            rollingPrintln("Please ensure that all the above numbers, this line, and the following lines are visible on your terminal window.");
             rollingPrintln("If they are not, resize and press enter to see these numbers again.");
             rollingPrintln("To exit this test, type done and press enter.");
             System.out.print("> ");
@@ -380,7 +380,7 @@ public class Simulation {
         textDelay();
         rollingPrint("It'd be to your advantage to take notes on the clues you find and remember, ");
         textDelay(250);
-        rollingPrint(ANSI_WHITE_BACKGROUND + ANSI_BLACK + " time is of the essence. " + ANSI_RESET);
+        rollingPrint(ANSI_WHITE_BACKGROUND + ANSI_BLACK + ANSI_BOLD + " time is of the essence. " + ANSI_RESET);
         textDelay();
         System.out.println();
         System.out.println();
@@ -393,7 +393,7 @@ public class Simulation {
         
         // Provide the user key game tips
         System.out.println("========================================== KEY GAME TIPS ==========================================");
-        rollingPrintln(" Press enter to exit results and dialogue screens.");
+        rollingPrintln(" Press enter to exit result and dialogue screens.");
         rollingPrintln(" Don't rush through. Keep an eye out for your lab results.");
         rollingPrintln(" Analyze samples you collect with Detective Joseph. Not everything is free. What would a cop want?");
         rollingPrintln(" Keep track of the clues you have collected. There is no way to go back.");
@@ -459,7 +459,7 @@ public class Simulation {
             clearConsole();
 
             // Deliver lab and camera results
-            if (labDNASample != null && turnsSinceDNASubmitted == 5) {
+            if (labDNASample != null && turnsSinceDNASubmitted == 10) {
                 System.out.println("===== Lab Results =====");
                 rollingPrintln("The DNA you collected from the " + labDNASample.getRoom().getName().toLowerCase() + (labDNASample.hasResult() ? " was identified as that of " + labDNASample.getSuspect().getName() + "." : " could not be identified."));
                 System.out.println("=======================");
@@ -472,7 +472,7 @@ public class Simulation {
                 } while (!answer.toLowerCase().equals("ok"));
                 labDNASample = null;
                 clearConsole();
-            } else if (labFingerprintSample != null && turnsSinceFingerprintsSubmitted == 5) {
+            } else if (labFingerprintSample != null && turnsSinceFingerprintsSubmitted == 10) {
                 System.out.println("===== Lab Results =====");
                 rollingPrintln("The fingerprints you collected from the " + labFingerprintSample.getWeapon().getName().toLowerCase() + " in the " + labFingerprintSample.getRoom().getName().toLowerCase() + " were identified as those of " + labFingerprintSample.getSuspect().getName() + ".");
                 System.out.println("=======================");
@@ -738,7 +738,7 @@ public class Simulation {
     }
 
     private void searchRoom() {
-        loadingAnimation(1);
+        loadingAnimation("Searching",1);
         totalRoomSearches++;
         double random = Math.random();
         if (currentRoom.hasItem() && !(inventory.contains(currentRoom.getItem()))) {
@@ -768,7 +768,7 @@ public class Simulation {
     }
 
     private void collectDNA() {
-        loadingAnimation(1);
+        loadingAnimation("Collecting",1);
         // 30% chance you can still find DNA if it is not relevant to the case
         if (currentRoom.getDNA() != null || Math.random() < 0.3) {
             rollingPrint("You've collected DNA from the " + currentRoom.getName().toLowerCase() + ". ");
@@ -781,7 +781,7 @@ public class Simulation {
     }
 
     private void collectFingerprints() {
-        loadingAnimation(1);
+        loadingAnimation("Collecting",1);
         if(currentRoom.hasWeapon()) {
             rollingPrint("You found a bloody " + currentRoom.getWeapon().getName().toLowerCase() + " with some fingerprints on it in the " + currentRoom.getName().toLowerCase() + "! ");
             textDelay();
@@ -797,7 +797,7 @@ public class Simulation {
     }
 
     private void scanUV() {
-        loadingAnimation(1);
+        loadingAnimation("Scanning",1);
         if(currentRoom.isUVCluePresent()) {
             rollingPrint("You found a some bloodspots on the wall of the " + currentRoom.getName().toLowerCase() + "!");
             totalUVScans++;
@@ -823,6 +823,7 @@ public class Simulation {
             textDelay();
             rollingPrint("Nice work, detective.");
             labDNASample = collectedDNASample;
+            turnsSinceDNASubmitted = 0;
             collectedDNASample = null;
             totalDNAAnalyzed++;
             numDonuts -= 2;
@@ -847,6 +848,7 @@ public class Simulation {
             textDelay();
             rollingPrint("Nice work, detective.");
             labFingerprintSample = collectedFingerprintSample;
+            turnsSinceFingerprintsSubmitted = 0;
             collectedFingerprintSample = null;
             totalFingerprintsAnalyzed++;
             numDonuts -= 2;
@@ -863,17 +865,18 @@ public class Simulation {
         clearConsole();
         rollingPrint("You want to request some camera footage from the night of the murder? ");
         textDelay();
-        rollingPrint("I'd be happy to oblige if you have a couple donuts, maybe two, for me. ");
+        rollingPrint("I'd be happy to oblige if you have a donut for me. ");
         textDelay();
         Command answer = promptYesNo("Do you have some I could take?", true);
         if (answer == Command.YES){
             rollingPrint("Thanks for the donuts! ");
             textDelay();
             String room = promptInput("Which room do you want the footage from? (Hall, Lounge, Dining Room, Kitchen, Ballroom, Conservatory, Billiard Room, Library, Study)", true, "Hall", "Lounge", "Dining Room", "Kitchen", "Ballroom", "Conservatory", "Billiard Room", "Library", "Study");
-            rollingPrint("Alright, the clips should be back in about 5 turns. ");
+            rollingPrint("Alright, the clips should be back in about 5 turns.");
             findingCameras = true;
             roomOfRequestedCameras = Arrays.stream(Room.values()).filter((a) -> room.equals(a.getName())).findFirst().get();
             suspectOfRequestedCameras = roomOfRequestedCameras.getCameraSubject();
+            turnsSinceCamerasRequested = 0;
             totalCamerasRequested++;
             numDonuts--;
             totalDonutsEatenByJoseph++;
@@ -1109,7 +1112,7 @@ public class Simulation {
             else if (map.charAt(i) == '2' || map.charAt(i) == '3') inRoom = false;
             switch (map.charAt(i)) {
                 case 'X':
-                    System.out.print(ANSI_WHITE_BACKGROUND + '\u00A0');
+                    System.out.print((color.equals("white") ? ANSI_BLUE_BACKGROUND : ANSI_WHITE_BACKGROUND) + '\u00A0');
                     if(i == map.length() - 1 || map.charAt(i + 1) != 'X') System.out.print(ANSI_RESET);
                     break;
                 
@@ -1198,8 +1201,12 @@ public class Simulation {
 
             // Print the command options
             for(Command command : commands) {
-                if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
-                else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription());
+                if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
+                                (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
+                );
+                else System.out.println(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
+                                (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
+                );
             }
         
             // Allow the user to provide input
@@ -1559,6 +1566,40 @@ public class Simulation {
         if (cycles <= 0) throw new IllegalArgumentException("Illegal number of loading animation cycles");
         clearConsole();
         for (int i = 0; i < cycles; i++) {
+            for(int j = 0; j < 5; j++) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    System.out.println();
+                }
+                System.out.print(".");
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                System.out.println();
+            }
+            clearConsole();
+        }
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            System.out.println();
+        }
+    }
+
+    /**
+     * Clears the console and prints a loading animations that cycles the given number of times.
+     * 
+     * @param prefix the string to add before each series of dots
+     * @param cycles the number of times to cycle the loading animation
+     * @throws IllegalArgumentException if {@code cycles} is negative or zero.
+     */
+    public static void loadingAnimation(String prefix, int cycles) throws IllegalArgumentException {
+        if (cycles <= 0) throw new IllegalArgumentException("Illegal number of loading animation cycles");
+        clearConsole();
+        for (int i = 0; i < cycles; i++) {
+            System.out.print(prefix);
             for(int j = 0; j < 5; j++) {
                 try {
                     Thread.sleep(1000);

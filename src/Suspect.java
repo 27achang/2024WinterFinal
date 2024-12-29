@@ -2,7 +2,7 @@
  * The Suspect enum type contains the possible suspects
  * 
  * @author Alexander Chang
- * @version 1.00, 12/19/2024
+ * @version 1.01, 12/29/2024
  */
 public enum Suspect {
     SCARLET("Miss Scarlet"),

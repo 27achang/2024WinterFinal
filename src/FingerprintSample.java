@@ -1,3 +1,9 @@
+/**
+ * The FingerprintSample class encapsulates functionality for fingerprint samples collected by the user
+ * 
+ * @author Alexander Chang
+ * @version 1.01, 12/29/2024
+ */
 public class FingerprintSample {
     private Room room;
     private Weapon weapon;

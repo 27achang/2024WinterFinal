@@ -1,3 +1,9 @@
+/**
+ * The DNASample class encapsulates functionality for DNA samples collected by the user
+ * 
+ * @author Alexander Chang
+ * @version 1.01, 12/29/2024
+ */
 public class DNASample {
     private Room room;
     private Suspect suspect;
