@@ -124,20 +124,12 @@ public class Simulation {
     private int totalCamerasRequested;
     private int totalDonutsEatenByJoseph;
 
-    private Room roomOfCollectedFingerprints;
-    private Weapon weaponOfCollectedFingerprints;
-    private Suspect suspectOfCollectedFingerprints;
-    private boolean labScanningFingerprints;
-    private Room roomOfLabFingerprints;
-    private Weapon weaponOfLabFingerprints;
-    private Suspect suspectOfLabFingerprints;
+    private FingerprintSample collectedFingerprintSample;
+    private FingerprintSample labFingerprintSample;
     private int turnsSinceFingerprintsSubmitted;
 
-    private Room roomOfCollectedDNA;
-    private Suspect suspectOfCollectedDNA;
-    private boolean labScanningDNA;
-    private Room roomOfLabDNA;
-    private Suspect suspectOfLabDNA;
+    private DNASample collectedDNASample;
+    private DNASample labDNASample;
     private int turnsSinceDNASubmitted;
     
     private Room roomOfRequestedCameras;
@@ -467,9 +459,9 @@ public class Simulation {
             clearConsole();
 
             // Deliver lab and camera results
-            if (labScanningDNA && turnsSinceDNASubmitted == 5) {
+            if (labDNASample != null && turnsSinceDNASubmitted == 5) {
                 System.out.println("===== Lab Results =====");
-                rollingPrintln("The DNA you collected from the " + roomOfLabDNA.getName().toLowerCase() + (suspectOfLabDNA != null ? " was identified as that of " + suspectOfLabDNA.getName() + "." : " could not be identified."));
+                rollingPrintln("The DNA you collected from the " + labDNASample.getRoom().getName().toLowerCase() + (labDNASample.hasResult() ? " was identified as that of " + labDNASample.getSuspect().getName() + "." : " could not be identified."));
                 System.out.println("=======================");
                 String answer;
                 do {
@@ -478,13 +470,11 @@ public class Simulation {
                     System.out.print("> ");
                     answer = input.nextLine();
                 } while (!answer.toLowerCase().equals("ok"));
-                roomOfLabDNA = null;
-                suspectOfLabDNA = null;
-                labScanningDNA = false;
+                labDNASample = null;
                 clearConsole();
-            } else if (labScanningFingerprints && turnsSinceFingerprintsSubmitted == 5) {
+            } else if (labFingerprintSample != null && turnsSinceFingerprintsSubmitted == 5) {
                 System.out.println("===== Lab Results =====");
-                rollingPrintln("The fingerprints you collected from the " + weaponOfLabFingerprints.getName().toLowerCase() + " in the " + roomOfLabFingerprints.getName().toLowerCase() + " were identified as those of " + suspectOfLabFingerprints.getName() + ".");
+                rollingPrintln("The fingerprints you collected from the " + labFingerprintSample.getWeapon().getName().toLowerCase() + " in the " + labFingerprintSample.getRoom().getName().toLowerCase() + " were identified as those of " + labFingerprintSample.getSuspect().getName() + ".");
                 System.out.println("=======================");
                 String answer;
                 do {
@@ -493,10 +483,7 @@ public class Simulation {
                     System.out.print("> ");
                     answer = input.nextLine();
                 } while (!answer.toLowerCase().equals("ok"));
-                roomOfLabFingerprints = null;
-                weaponOfLabFingerprints = null;
-                suspectOfLabFingerprints = null;
-                labScanningFingerprints = false;
+                labFingerprintSample = null;
                 clearConsole();
             } else if (findingCameras && turnsSinceCamerasRequested == 5) {
                 System.out.println("===== Camera Results =====");
@@ -533,9 +520,9 @@ public class Simulation {
             if (currentRoom == Room.STAIRCASE) {
                 options.add(Command.UP);
                 if (numDonuts >= 2) {
-                    if (!labScanningDNA && !labScanningFingerprints) {
-                        if (roomOfCollectedDNA != null) options.add(Command.SUBMIT_DNA);
-                        if (roomOfCollectedFingerprints != null) options.add(Command.SUBMIT_FINGERPRINTS);
+                    if (labDNASample == null && labFingerprintSample == null) {
+                        if (collectedDNASample != null) options.add(Command.SUBMIT_DNA);
+                        if (collectedFingerprintSample != null) options.add(Command.SUBMIT_FINGERPRINTS);
                     }
                 }
                 if (!findingCameras && numDonuts >= 1) options.add(Command.REQUEST_CAMERA);
@@ -554,8 +541,8 @@ public class Simulation {
                 // Determine available room options
                 if (currentRoom != null && currentRoom != Room.STAIRCASE) {
                     options.add(Command.SEARCH);
-                    if (inventory.contains(Item.DNA_COLLECTOR) && roomOfCollectedDNA == null) options.add(Command.COLLECT_DNA);
-                    if (inventory.contains(Item.FINGERPRINT_COLLECTOR) && roomOfCollectedFingerprints == null) options.add(Command.COLLECT_FINGERPRINTS);
+                    if (inventory.contains(Item.DNA_COLLECTOR) && collectedDNASample == null) options.add(Command.COLLECT_DNA);
+                    if (inventory.contains(Item.FINGERPRINT_COLLECTOR) && collectedFingerprintSample == null) options.add(Command.COLLECT_FINGERPRINTS);
                     if (inventory.contains(Item.UV_SCANNER)) options.add(Command.UV_SCAN);
                     if(currentCell == '/' || currentCell == '\\') options.add(Command.PASS);
                 }
@@ -674,23 +661,29 @@ public class Simulation {
             } catch (NoSuchElementException e) {}
 
             // Increment the turns counters
-            if(action != Command.INVENTORY) actionableTurns++;
+            if(action != Command.INVENTORY) {
+                actionableTurns++;
+                if (labDNASample != null && action != Command.SUBMIT_DNA) turnsSinceDNASubmitted++;
+                if (labFingerprintSample != null && action != Command.SUBMIT_FINGERPRINTS) turnsSinceFingerprintsSubmitted++;
+                if (findingCameras && action != Command.REQUEST_CAMERA) turnsSinceCamerasRequested++;
+            }
             turns++;
             if (totalDonutsFound > 0) turnsSinceLastDonutFound++;
-            if (labScanningDNA && action != Command.SUBMIT_DNA) turnsSinceDNASubmitted++;
-            if (labScanningFingerprints && action != Command.SUBMIT_FINGERPRINTS) turnsSinceFingerprintsSubmitted++;
-            if (findingCameras && action != Command.REQUEST_CAMERA) turnsSinceCamerasRequested++;
 
             if (actionableTurns > 250) {
                 gameActive = false;
                 tookTooLong = true;
             }
         }
+        end();
+    }
+
+    private void end() {
         clearConsole();
         if (tookTooLong) {
             rollingPrint("Unfortunately, detective " + name + ", you took too long in your investigation. ");
             textDelay();
-            rollingPrint("The suspects most likely out of the country and out of our control by now. ");
+            rollingPrint("The suspect's most likely out of the country and out of our control by now. ");
             textDelay();
             rollingPrint("Better luck next time.");
         } else {
@@ -700,17 +693,17 @@ public class Simulation {
             input.nextLine();
             System.out.println();
             rollingPrintln("         Your Guess      | Correct Answer");
-            rollingPrint("Suspect: " + guessedSuspect + (new String(new char[15 - guessedSuspect.length()]).replace("\0", " ")) + " | ");
+            rollingPrint("Suspect: " + guessedSuspect + repeat(" ", 15 - guessedSuspect.length()) + " | ");
             textDelay();
-            rollingPrintln((guessedSuspect.equals(answerSuspect.getName()) ? ANSI_GREEN_BACKGROUND : ANSI_RED_BACKGROUND) + answerSuspect + (new String(new char[15 - answerSuspect.getName().length()]).replace("\0", " ")) + ANSI_RESET);
+            rollingPrintln((guessedSuspect.equals(answerSuspect.getName()) ? ANSI_GREEN_BACKGROUND : ANSI_RED_BACKGROUND) + answerSuspect + repeat(" ", 15 - answerSuspect.getName().length()) + ANSI_RESET);
             textDelay();
-            rollingPrint(" Weapon: " + guessedWeapon + (new String(new char[15 - guessedWeapon.length()]).replace("\0", " ")) + " | ");
+            rollingPrint(" Weapon: " + guessedWeapon + repeat(" ", 15 - guessedWeapon.length()) + " | ");
             textDelay();
-            rollingPrintln((guessedWeapon.equals(answerWeapon.getName()) ? ANSI_GREEN_BACKGROUND : ANSI_RED_BACKGROUND) + answerWeapon + (new String(new char[15 - answerWeapon.getName().length()]).replace("\0", " ")) + ANSI_RESET);
+            rollingPrintln((guessedWeapon.equals(answerWeapon.getName()) ? ANSI_GREEN_BACKGROUND : ANSI_RED_BACKGROUND) + answerWeapon + repeat(" ", 15 - answerWeapon.getName().length()) + ANSI_RESET);
             textDelay();
-            rollingPrint("   Room: " + guessedRoom + (new String(new char[15 - guessedRoom.length()]).replace("\0", " ")) + " | ");
+            rollingPrint("   Room: " + guessedRoom + repeat(" ", 15 - guessedRoom.length()) + " | ");
             textDelay();
-            rollingPrintln((guessedRoom.equals(answerRoom.getName()) ? ANSI_GREEN_BACKGROUND : ANSI_RED_BACKGROUND) + answerRoom + (new String(new char[15 - answerRoom.getName().length()]).replace("\0", " ")) + ANSI_RESET);
+            rollingPrintln((guessedRoom.equals(answerRoom.getName()) ? ANSI_GREEN_BACKGROUND : ANSI_RED_BACKGROUND) + answerRoom + repeat(" ", 15 - answerRoom.getName().length()) + ANSI_RESET);
             System.out.println();
             if (solvedMystery) {
                 rollingPrint("Very nicely done, detective " + name + "! I'm glad I could trust you.");
@@ -742,7 +735,6 @@ public class Simulation {
         rollingPrintln("               Total UV scans completed: " + totalUVScans);
         rollingPrintln("      Total pieces of footage requested: " + totalCamerasRequested);
         rollingPrintln(" Total donuts eaten by detective Joseph: " + totalDonutsEatenByJoseph);
-
     }
 
     private void searchRoom() {
@@ -783,8 +775,7 @@ public class Simulation {
             textDelay();
             rollingPrint("Submit it to Detective Joseph at the central staircase for analysis.");
             totalDNACollected++;
-            roomOfCollectedDNA = currentRoom;
-            suspectOfCollectedDNA = currentRoom.getDNA();
+            collectedDNASample = new DNASample(currentRoom, currentRoom.getDNA());
         } else rollingPrint("You struggled to find anything to collect DNA from in the " + currentRoom.getName().toLowerCase() + ".");
         input.nextLine();
     }
@@ -796,13 +787,10 @@ public class Simulation {
             textDelay();
             rollingPrint("Submit it to Detective Joseph at the central staircase for analysis.");
             totalFingerprintsCollected++;
-            roomOfCollectedFingerprints = currentRoom;
-            weaponOfCollectedFingerprints = currentRoom.getWeapon();
-            suspectOfCollectedFingerprints = currentRoom.getWeaponFingerprints();
+            collectedFingerprintSample = new FingerprintSample(currentRoom, currentRoom.getWeapon(), currentRoom.getWeaponFingerprints());
         }
         else{
-            double random = Math.random();
-            if(random < 0.5) rollingPrint("You struggled to find any fingerprints in the " + currentRoom.getName().toLowerCase() + ".");
+            if(Math.random() < 0.5) rollingPrint("You struggled to find any fingerprints in the " + currentRoom.getName().toLowerCase() + ".");
             else rollingPrint("You found some weak fingerprints in the corner of the " + currentRoom.getName().toLowerCase() + " but struggled to collect them.");
         }
         input.nextLine();
@@ -815,8 +803,7 @@ public class Simulation {
             totalUVScans++;
         }
         else{
-            double random = Math.random();
-            if(random < 0.5) rollingPrint("You thought you saw something on the wall of the " + currentRoom.getName().toLowerCase() + ", but it turned out to be a fluke.");
+            if(Math.random() < 0.5) rollingPrint("You thought you saw something on the wall of the " + currentRoom.getName().toLowerCase() + ", but it turned out to be a fluke.");
             else rollingPrint("You didn't see a thing when you turned on your UV light in the " + currentRoom.getName().toLowerCase() + ".");
         }
         input.nextLine();
@@ -835,11 +822,8 @@ public class Simulation {
             rollingPrint("It'll be about 5 turns until the analysis will be ready. ");
             textDelay();
             rollingPrint("Nice work, detective.");
-            labScanningDNA = true;
-            suspectOfLabDNA = suspectOfCollectedDNA;
-            roomOfLabDNA = roomOfCollectedDNA;
-            suspectOfCollectedDNA = null;
-            roomOfCollectedDNA = null;
+            labDNASample = collectedDNASample;
+            collectedDNASample = null;
             totalDNAAnalyzed++;
             numDonuts -= 2;
             totalDonutsEatenByJoseph += 2;
@@ -862,13 +846,8 @@ public class Simulation {
             rollingPrint("It'll be about 5 turns until the analysis will be ready. ");
             textDelay();
             rollingPrint("Nice work, detective.");
-            labScanningFingerprints = true;
-            roomOfLabFingerprints = roomOfCollectedFingerprints;
-            weaponOfLabFingerprints = weaponOfCollectedFingerprints;
-            suspectOfLabFingerprints = suspectOfCollectedFingerprints;
-            roomOfCollectedFingerprints = null;
-            weaponOfCollectedFingerprints = null;
-            suspectOfCollectedFingerprints = null;
+            labFingerprintSample = collectedFingerprintSample;
+            collectedFingerprintSample = null;
             totalFingerprintsAnalyzed++;
             numDonuts -= 2;
             totalDonutsEatenByJoseph += 2;
@@ -1535,6 +1514,17 @@ public class Simulation {
     }
 
     /**
+     * Repeat the provided string a given number of times.
+     * 
+     * @param str the string to repeat
+     * @param times the number of times to repeat the string
+     * @throws IllegalArgumentException if {@code times} is negative or zero.
+     */
+    public static String repeat(String str, int times) throws IllegalArgumentException {
+        return new String(new char[times]).replace("\0", str);
+    }
+
+    /**
      * Delays 500 milliseconds to provide a break in the printing to system output.
      */
     public static void textDelay() {
@@ -1547,8 +1537,11 @@ public class Simulation {
 
     /**
      * Delays the given number of milliseconds to provide a break in the printing to system output.
+     * 
+     * @param millis the number of milliseconds to delay
+     * @throws IllegalArgumentException if {@code millis} is negative
      */
-    public static void textDelay(int millis) {
+    public static void textDelay(int millis) throws IllegalArgumentException {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
@@ -1560,7 +1553,7 @@ public class Simulation {
      * Clears the console and prints a loading animations that cycles the given number of times.
      * 
      * @param cycles the number of times to cycle the loading animation
-     * @throws IllegalArgumentException if {@code cycles} is less negative or zero.
+     * @throws IllegalArgumentException if {@code cycles} is negative or zero.
      */
     public static void loadingAnimation(int cycles) throws IllegalArgumentException {
         if (cycles <= 0) throw new IllegalArgumentException("Illegal number of loading animation cycles");
