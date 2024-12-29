@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 public class Simulation {
     // ANSI COLOR CODES
     public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BOLD = "\u001B[1m";
+    public static final String ANSI_NOT_BOLD = "\u001B[22m";
     
     public static final String ANSI_BLACK = "\u001B[30m";
     public static final String ANSI_RED = "\u001B[31m";
@@ -97,6 +99,8 @@ public class Simulation {
     private boolean gameActive;
     private String name;
     private String color;
+    private String character;
+    private String playerANSIColor;
     private ArrayList<Item> inventory = new ArrayList<>();
     private Room currentRoom;
     private ArrayList<Room> visitedRooms = new ArrayList<>();
@@ -229,9 +233,8 @@ public class Simulation {
         clearConsole();
 
         // Tell the user about Clue 2.0
-        rollingPrintln("This project attempts to recreate the classic mystery game Clue, adding more modern features and items. This project was completed in its entirety by Alexander Chang. Unauthorized reproduction " +
-            ANSI_WHITE_BACKGROUND + ANSI_BLACK + " or distribution " + ANSI_RESET + """
-             of this project is prohibited by law.
+        rollingPrintln("""
+            This project attempts to recreate the classic mystery game Clue, adding more modern features and items. This project was completed in its entirety by Alexander Chang. Unauthorized reproduction \u001B[1mor distribution\u001B[0m of this project is prohibited by law.
             (c) 2024 by Alexander Chang. All rights reserved."""
         );
 
@@ -325,6 +328,37 @@ public class Simulation {
         textDelay();
         rollingPrintln("(scarlet, mustard, white, green, blue, or plum)");
         color = promptInput(true, "scarlet", "mustard", "white", "green", "blue", "plum");
+        switch (color) {
+            case "scarlet" -> {
+                character = "S";
+                playerANSIColor = ANSI_RED_BACKGROUND;
+            }
+
+            case "mustard" -> {
+                character = "M";
+                playerANSIColor = ANSI_YELLOW_BACKGROUND;
+            }
+
+            case "white" -> {
+                character = "W";
+                playerANSIColor = ANSI_WHITE_BACKGROUND;
+            }
+
+            case "green" -> {
+                character = "G";
+                playerANSIColor = ANSI_GREEN_BACKGROUND;
+            }
+
+            case "blue" -> {
+                character = "P";
+                playerANSIColor = ANSI_BLUE_BACKGROUND;
+            }
+
+            case "plum" -> {
+                character = "P";
+                playerANSIColor = ANSI_PURPLE_BACKGROUND;
+            }
+        }
         rollingPrint("Oh, ");
         textDelay(250);
         rollingPrint("nice choice. ");
@@ -447,6 +481,7 @@ public class Simulation {
                 roomOfLabDNA = null;
                 suspectOfLabDNA = null;
                 labScanningDNA = false;
+                clearConsole();
             } else if (labScanningFingerprints && turnsSinceFingerprintsSubmitted == 5) {
                 System.out.println("===== Lab Results =====");
                 rollingPrintln("The fingerprints you collected from the " + weaponOfLabFingerprints.getName().toLowerCase() + " in the " + roomOfLabFingerprints.getName().toLowerCase() + " were identified as those of " + suspectOfLabFingerprints.getName() + ".");
@@ -462,15 +497,21 @@ public class Simulation {
                 weaponOfLabFingerprints = null;
                 suspectOfLabFingerprints = null;
                 labScanningFingerprints = false;
+                clearConsole();
             } else if (findingCameras && turnsSinceCamerasRequested == 5) {
                 System.out.println("===== Camera Results =====");
-                rollingPrintln("The footage that you requested of the " + roomOfRequestedCameras.getName().toLowerCase() + " on the night of the murder showed " + suspectOfRequestedCameras.getName());
-                double random = Math.random();
-                if (random < 0.2) rollingPrint(" sulking around.");
-                else if (random < 0.4) rollingPrint(" acting suspicious.");
-                else if (random < 0.6) rollingPrint(" barely at the edge of the frame.");
-                else if (random < 0.8) rollingPrint(" sneaking across the opposite wall.");
-                else if (random < 1) rollingPrint(" hunched over something.");
+                rollingPrint("The footage that you requested of the " + roomOfRequestedCameras.getName().toLowerCase() + " on the night of the murder showed ");
+                if (suspectOfRequestedCameras != null) {
+                    rollingPrintln(suspectOfRequestedCameras.getName());
+                    double random = Math.random();
+                    if (random < 0.2) rollingPrint(" sulking around.");
+                    else if (random < 0.4) rollingPrint(" acting suspicious.");
+                    else if (random < 0.6) rollingPrint(" barely at the edge of the frame.");
+                    else if (random < 0.8) rollingPrint(" sneaking across the opposite wall.");
+                    else if (random < 1) rollingPrint(" hunched over something.");
+                } else {
+                    rollingPrintln("no activity.");
+                }
                 System.out.println("==========================");
                 String answer;
                 do {
@@ -482,6 +523,7 @@ public class Simulation {
                 roomOfRequestedCameras = null;
                 suspectOfRequestedCameras = null;
                 findingCameras = false;
+                clearConsole();
             }
 
             // Determine the actions available to the user
@@ -850,8 +892,6 @@ public class Simulation {
             textDelay();
             String room = promptInput("Which room do you want the footage from? (Hall, Lounge, Dining Room, Kitchen, Ballroom, Conservatory, Billiard Room, Library, Study)", true, "Hall", "Lounge", "Dining Room", "Kitchen", "Ballroom", "Conservatory", "Billiard Room", "Library", "Study");
             rollingPrint("Alright, the clips should be back in about 5 turns. ");
-            textDelay();
-            rollingPrint("Nice work, detective.");
             findingCameras = true;
             roomOfRequestedCameras = Arrays.stream(Room.values()).filter((a) -> room.equals(a.getName())).findFirst().get();
             suspectOfRequestedCameras = roomOfRequestedCameras.getCameraSubject();
@@ -1090,32 +1130,32 @@ public class Simulation {
             else if (map.charAt(i) == '2' || map.charAt(i) == '3') inRoom = false;
             switch (map.charAt(i)) {
                 case 'X':
-                    System.out.print(ANSI_RED_BACKGROUND + '\u00A0');
+                    System.out.print(ANSI_WHITE_BACKGROUND + '\u00A0');
                     if(i == map.length() - 1 || map.charAt(i + 1) != 'X') System.out.print(ANSI_RESET);
                     break;
                 
                 case '1':
-                    if (i == 27 * yPos + xPos) System.out.print(ANSI_WHITE_BACKGROUND + " " + ANSI_GRAY_BACKGROUND);
+                    if (i == 27 * yPos + xPos) System.out.print(playerANSIColor + ANSI_BOLD + character + ANSI_NOT_BOLD + ANSI_GRAY_BACKGROUND);
                     else System.out.print(ANSI_GRAY_BACKGROUND + " ");
                     break;
                 
                 case '2':
-                    if (i == 27 * yPos + xPos) System.out.print(ANSI_WHITE_BACKGROUND + " " + ANSI_RESET);
+                    if (i == 27 * yPos + xPos) System.out.print(playerANSIColor + ANSI_BOLD + character + ANSI_RESET);
                     else System.out.print(" " + ANSI_RESET);
                     break;
 
                 case '3':
-                    if (i == 27 * yPos + xPos) System.out.print(ANSI_WHITE_BACKGROUND + "/" + ANSI_RESET);
+                    if (i == 27 * yPos + xPos) System.out.print(playerANSIColor + "/" + ANSI_RESET);
                     else System.out.print("/" + ANSI_RESET);
                     break;
                 
                 case '4':
-                    if (i == 27 * yPos + xPos) System.out.print(ANSI_WHITE_BACKGROUND + "\\" + ANSI_GRAY_BACKGROUND);
+                    if (i == 27 * yPos + xPos) System.out.print(playerANSIColor + "\\" + ANSI_GRAY_BACKGROUND);
                     else System.out.print(ANSI_GRAY_BACKGROUND + "\\");
                     break;
 
                 default:
-                    if (i == 27 * yPos + xPos) System.out.print(ANSI_WHITE_BACKGROUND + map.charAt(i) + (inRoom ? ANSI_GRAY_BACKGROUND : ANSI_RESET));
+                    if (i == 27 * yPos + xPos) System.out.print(playerANSIColor + ANSI_BOLD + (map.charAt(i) == ' ' ? character : map.charAt(i)) + (inRoom ? ANSI_NOT_BOLD + ANSI_GRAY_BACKGROUND : ANSI_RESET));
                     else System.out.print(map.charAt(i));
                     break;
             }
