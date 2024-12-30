@@ -226,7 +226,7 @@ public class Simulation {
 
         // Tell the user about Clue 2.0
         rollingPrintln("""
-            This project attempts to recreate the classic mystery game Clue, adding more modern features and items. This project was completed in its entirety by Alexander Chang. Unauthorized reproduction \u001B[1mor distribution\u001B[0m of this project is prohibited by law.
+            This project attempts to recreate the classic mystery game Clue, adding more modern features and items. This project was completed in its entirety by Alexander Chang. Special thanks to Oliver Waldin for his assistance in decisions and brainstorming of game mechanics. Unauthorized reproduction \u001B[1mor distribution\u001B[0m of this project is prohibited by law.
             (c) 2024 by Alexander Chang. All rights reserved."""
         );
 
