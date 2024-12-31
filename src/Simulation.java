@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
  * The Simulation class contains the core mechanics of the game including turn actions and prompting for input
  * 
  * @author Alexander Chang
- * @version 1.01, 12/29/2024
+ * @version 1.02, 12/30/2024
  */
 public class Simulation {
     // ANSI COLOR CODES
