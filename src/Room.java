@@ -22,7 +22,6 @@ public enum Room {
     private Weapon weapon;
     private Suspect weaponFingerprints;
     private Suspect DNA;
-    private Suspect cameraSubject;
     private boolean UVCluePresent;
 
     Room(String name, int[][] entrances) {
@@ -54,10 +53,6 @@ public enum Room {
         this.DNA = DNA;
     }
 
-    void setCameraSubject(Suspect cameraSubject) {
-        this.cameraSubject = cameraSubject;
-    }
-
     void setUVCluePresent(boolean UVCluePresent) {
         this.UVCluePresent = UVCluePresent;
     }
@@ -84,10 +79,6 @@ public enum Room {
 
     Suspect getDNA() {
         return DNA;
-    }
-
-    Suspect getCameraSubject() {
-        return cameraSubject;
     }
 
     boolean isUVCluePresent() {

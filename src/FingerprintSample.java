@@ -2,13 +2,14 @@
  * The FingerprintSample class encapsulates functionality for fingerprint samples collected by the user
  * 
  * @author Alexander Chang
- * @version 1.01, 12/29/2024
+ * @version 1.02, 12/30/2024
  */
 public class FingerprintSample {
     private Room room;
     private Weapon weapon;
     private Suspect suspect;
     private boolean hasResult;
+    private final int turnsForAnalysis = (int)(Math.random() * 6) + 5;
 
     FingerprintSample(Room room, Weapon weapon, Suspect suspect) {
         this.room = room;
@@ -31,6 +32,10 @@ public class FingerprintSample {
 
     boolean hasResult() {
         return hasResult;
+    }
+
+    int getTurnsForAnalysis() {
+        return turnsForAnalysis;
     }
 
     @Override

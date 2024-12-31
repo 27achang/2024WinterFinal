@@ -132,9 +132,8 @@ public class Simulation {
     private DNASample labDNASample;
     private int turnsSinceDNASubmitted;
     
-    private Room roomOfRequestedCameras;
-    private Suspect suspectOfRequestedCameras;
-    private boolean findingCameras;
+    private final int donutsForCameraRequest = (int)(Math.random() * 4) + 2;
+    private CameraResult requestedCameras;
     private int turnsSinceCamerasRequested;
 
     private Suspect answerSuspect;
@@ -459,7 +458,7 @@ public class Simulation {
             clearConsole();
 
             // Deliver lab and camera results
-            if (labDNASample != null && turnsSinceDNASubmitted == 10) {
+            if (labDNASample != null && turnsSinceDNASubmitted == labDNASample.getTurnsForAnalysis()) {
                 System.out.println("===== Lab Results =====");
                 rollingPrintln("The DNA you collected from the " + labDNASample.getRoom().getName().toLowerCase() + (labDNASample.hasResult() ? " was identified as that of " + labDNASample.getSuspect().getName() + "." : " could not be identified."));
                 System.out.println("=======================");
@@ -472,7 +471,7 @@ public class Simulation {
                 } while (!answer.toLowerCase().equals("ok"));
                 labDNASample = null;
                 clearConsole();
-            } else if (labFingerprintSample != null && turnsSinceFingerprintsSubmitted == 10) {
+            } else if (labFingerprintSample != null && turnsSinceFingerprintsSubmitted == labFingerprintSample.getTurnsForAnalysis()) {
                 System.out.println("===== Lab Results =====");
                 rollingPrintln("The fingerprints you collected from the " + labFingerprintSample.getWeapon().getName().toLowerCase() + " in the " + labFingerprintSample.getRoom().getName().toLowerCase() + " were identified as those of " + labFingerprintSample.getSuspect().getName() + ".");
                 System.out.println("=======================");
@@ -485,20 +484,9 @@ public class Simulation {
                 } while (!answer.toLowerCase().equals("ok"));
                 labFingerprintSample = null;
                 clearConsole();
-            } else if (findingCameras && turnsSinceCamerasRequested == 5) {
+            } else if (requestedCameras != null && turnsSinceCamerasRequested == requestedCameras.getTurnsForAnalysis()) {
                 System.out.println("===== Camera Results =====");
-                rollingPrint("The footage that you requested of the " + roomOfRequestedCameras.getName().toLowerCase() + " on the night of the murder showed ");
-                if (suspectOfRequestedCameras != null) {
-                    rollingPrintln(suspectOfRequestedCameras.getName());
-                    double random = Math.random();
-                    if (random < 0.2) rollingPrint(" sulking around.");
-                    else if (random < 0.4) rollingPrint(" acting suspicious.");
-                    else if (random < 0.6) rollingPrint(" barely at the edge of the frame.");
-                    else if (random < 0.8) rollingPrint(" sneaking across the opposite wall.");
-                    else if (random < 1) rollingPrint(" hunched over something.");
-                } else {
-                    rollingPrintln("no activity.");
-                }
+                rollingPrintln(requestedCameras.generateMessage());
                 System.out.println("==========================");
                 String answer;
                 do {
@@ -507,9 +495,7 @@ public class Simulation {
                     System.out.print("> ");
                     answer = input.nextLine();
                 } while (!answer.toLowerCase().equals("ok"));
-                roomOfRequestedCameras = null;
-                suspectOfRequestedCameras = null;
-                findingCameras = false;
+                requestedCameras = null;
                 clearConsole();
             }
 
@@ -525,7 +511,7 @@ public class Simulation {
                         if (collectedFingerprintSample != null) options.add(Command.SUBMIT_FINGERPRINTS);
                     }
                 }
-                if (!findingCameras && numDonuts >= 1) options.add(Command.REQUEST_CAMERA);
+                if (requestedCameras != null && numDonuts >= donutsForCameraRequest) options.add(Command.REQUEST_CAMERA);
                 options.add(Command.ACCUSE);
 
             } else {
@@ -665,7 +651,7 @@ public class Simulation {
                 actionableTurns++;
                 if (labDNASample != null && action != Command.SUBMIT_DNA) turnsSinceDNASubmitted++;
                 if (labFingerprintSample != null && action != Command.SUBMIT_FINGERPRINTS) turnsSinceFingerprintsSubmitted++;
-                if (findingCameras && action != Command.REQUEST_CAMERA) turnsSinceCamerasRequested++;
+                if (requestedCameras != null && action != Command.REQUEST_CAMERA) turnsSinceCamerasRequested++;
             }
             turns++;
             if (totalDonutsFound > 0) turnsSinceLastDonutFound++;
@@ -819,7 +805,7 @@ public class Simulation {
         if (answer == Command.YES){
             rollingPrint("Thanks for the donuts! ");
             textDelay();
-            rollingPrint("It'll be about 5 turns until the analysis will be ready. ");
+            rollingPrint("It'll be about 8 turns until the analysis will be ready. ");
             textDelay();
             rollingPrint("Nice work, detective.");
             labDNASample = collectedDNASample;
@@ -844,7 +830,7 @@ public class Simulation {
         if (answer == Command.YES){
             rollingPrint("Thanks for obliging. ");
             textDelay();
-            rollingPrint("It'll be about 5 turns until the analysis will be ready. ");
+            rollingPrint("It'll be about 8 turns until the analysis will be ready. ");
             textDelay();
             rollingPrint("Nice work, detective.");
             labFingerprintSample = collectedFingerprintSample;
@@ -863,23 +849,20 @@ public class Simulation {
 
     private void requestCamera() {
         clearConsole();
-        rollingPrint("You want to request some camera footage from the night of the murder? ");
+        rollingPrint("You want to request all the camera footage from the night of the murder? ");
         textDelay();
-        rollingPrint("I'd be happy to oblige if you have a donut for me. ");
+        rollingPrint("I'd be happy to oblige if you have " + donutsForCameraRequest + " donuts for me. ");
         textDelay();
         Command answer = promptYesNo("Do you have some I could take?", true);
         if (answer == Command.YES){
             rollingPrint("Thanks for the donuts! ");
             textDelay();
-            String room = promptInput("Which room do you want the footage from? (Hall, Lounge, Dining Room, Kitchen, Ballroom, Conservatory, Billiard Room, Library, Study)", true, "Hall", "Lounge", "Dining Room", "Kitchen", "Ballroom", "Conservatory", "Billiard Room", "Library", "Study");
-            rollingPrint("Alright, the clips should be back in about 5 turns.");
-            findingCameras = true;
-            roomOfRequestedCameras = Arrays.stream(Room.values()).filter((a) -> room.equals(a.getName())).findFirst().get();
-            suspectOfRequestedCameras = roomOfRequestedCameras.getCameraSubject();
+            rollingPrint("The clips should be back in about 8 turns.");
+            requestedCameras = new CameraResult(answerRoom, answerWeapon, answerSuspect);
             turnsSinceCamerasRequested = 0;
             totalCamerasRequested++;
-            numDonuts--;
-            totalDonutsEatenByJoseph++;
+            numDonuts -= donutsForCameraRequest;
+            totalDonutsEatenByJoseph += donutsForCameraRequest;
         } else {
             rollingPrint("You don't? ");
             textDelay();
@@ -924,7 +907,7 @@ public class Simulation {
             int random;
             Room room;
             do{
-                random = (int)(Math.random() * 9);
+                random = (int)(Math.random() * 10);
                 room = Room.values()[random];
             } while (room.hasItem());
             room.setItem(item);
@@ -956,9 +939,6 @@ public class Simulation {
 
         // Place the DNA
         answerRoom.setDNA(answerSuspect);
-
-        // Place the camera sighting
-        answerRoom.setCameraSubject(answerSuspect);
 
         // Place the UV clue (75% chance one is placed)
         answerRoom.setUVCluePresent(Math.random() < 0.75);
