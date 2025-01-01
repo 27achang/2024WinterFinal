@@ -6,11 +6,11 @@
  */
 public class CameraResult {
     private Room room;
-    private boolean roomIsRedHerring = true;
+    private boolean roomIsRedHerring;
     private Weapon weapon;
-    private boolean weaponIsRedHerring = true;
+    private boolean weaponIsRedHerring;
     private Suspect suspect;
-    private boolean suspectIsRedHerring = true;
+    private boolean suspectIsRedHerring;
     private final int turnsForAnalysis = (int)(Math.random() * 3) + 8;
 
     CameraResult(Room answerRoom, Weapon answerWeapon, Suspect answerSuspect) {

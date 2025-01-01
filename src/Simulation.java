@@ -511,7 +511,7 @@ public class Simulation {
                         if (collectedFingerprintSample != null) options.add(Command.SUBMIT_FINGERPRINTS);
                     }
                 }
-                if (requestedCameras != null && numDonuts >= donutsForCameraRequest) options.add(Command.REQUEST_CAMERA);
+                if (requestedCameras == null && numDonuts >= donutsForCameraRequest) options.add(Command.REQUEST_CAMERAS);
                 options.add(Command.ACCUSE);
 
             } else {
@@ -627,7 +627,7 @@ public class Simulation {
                 case Command.UV_SCAN -> scanUV();
                 case Command.SUBMIT_DNA -> submitDNA();
                 case Command.SUBMIT_FINGERPRINTS -> submitFingerprints();
-                case Command.REQUEST_CAMERA -> requestCamera();
+                case Command.REQUEST_CAMERAS -> requestCamera();
                 case Command.ACCUSE -> {
                     Command answer = promptYesNo("You think you know whodunit? Are you sure you're ready to report your final findings?",true);
                     if (answer == Command.NO) {
@@ -651,7 +651,7 @@ public class Simulation {
                 actionableTurns++;
                 if (labDNASample != null && action != Command.SUBMIT_DNA) turnsSinceDNASubmitted++;
                 if (labFingerprintSample != null && action != Command.SUBMIT_FINGERPRINTS) turnsSinceFingerprintsSubmitted++;
-                if (requestedCameras != null && action != Command.REQUEST_CAMERA) turnsSinceCamerasRequested++;
+                if (requestedCameras != null && action != Command.REQUEST_CAMERAS) turnsSinceCamerasRequested++;
             }
             turns++;
             if (totalDonutsFound > 0) turnsSinceLastDonutFound++;
@@ -879,17 +879,17 @@ public class Simulation {
         textDelay();
         rollingPrint("Who murdered Thompson? ");
         textDelay();
-        rollingPrintln("(Miss Scarlet, Colonel Mustard, Mrs. White, Reverend Green, Mrs. Peacock, Professor Plum)");
-        guessedSuspect = promptInput(true, "Miss Scarlet", "Colonel Mustard", "Mrs. White", "Reverend Green", "Mrs. Peacock", "Professor Plum");
+        rollingPrintln("(" + Arrays.stream(Suspect.values()).map(Suspect::getName).collect(Collectors.joining(", ")) + ")");
+        guessedSuspect = promptInput(true, "Miss Scarlett", "Colonel Mustard", "Mrs. White", "Reverend Green", "Mrs. Peacock", "Professor Plum");
         System.out.println();
         rollingPrint("What was he murdered with? ");
         textDelay();
-        rollingPrintln("(Candlestick, Dagger, Lead pipe, Revolver, Rope, Wrench)");
+        rollingPrintln("(" + Arrays.stream(Weapon.values()).map(Weapon::getName).collect(Collectors.joining(", ")) + ")");
         guessedWeapon = promptInput(true, "Candlestick", "Dagger", "Lead pipe", "Revolver", "Rope", "Wrench");
         System.out.println();
         rollingPrint("Where was he murdered? ");
         textDelay();
-        rollingPrintln("(Hall, Lounge, Dining Room, Kitchen, Ballroom, Conservatory, Billiard Room, Library, Study)");
+        rollingPrintln("(" + Arrays.stream(Room.values()).limit(9).map(Room::getName).collect(Collectors.joining(", ")) + ")");
         guessedRoom = promptInput(true, "Hall", "Lounge", "Dining Room", "Kitchen", "Ballroom", "Conservatory", "Billiard Room", "Library", "Study");
         suspectCorrect = guessedSuspect.equals(answerSuspect.getName());
         weaponCorrect = guessedWeapon.equals(answerWeapon.getName());
