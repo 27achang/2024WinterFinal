@@ -56,15 +56,19 @@ public class CameraResult {
 
     String generateMessage() {
         String message = "The footage that you requested from the night of the murder showed ";
+
+        // Edge cases
         if (room == null) return message + "no activity.";
         if (roomIsRedHerring && weapon == null && suspect == null) return message + "some activity in the " + room.getName().toLowerCase() + ".";
-        if (!roomIsRedHerring && !weaponIsRedHerring && !suspectIsRedHerring) return message + (suspect != null ? suspect.getName() : "a figure") + " killing Thompson " + (weapon != null ? "with a " + weapon.getName().toLowerCase() + " " : "") + "in the " + room.getName() + ".";
-        else if (suspectIsRedHerring) {
+        if (!roomIsRedHerring && !weaponIsRedHerring && !suspectIsRedHerring) return message + (suspect != null ? suspect.getName() : "a figure") + " killing Thompson " + (weapon != null ? "with a " + weapon.getName().toLowerCase() + " " : "") + "in the " + room.getName().toLowerCase() + ".";
+        
+        // General processing
+        if (suspectIsRedHerring) {
             message += suspect.getName() + " passing through the " + room.getName().toLowerCase();
             if (weapon != null || !roomIsRedHerring) {
                 message += " with a ";
                 if (weapon != null) {
-                    if (weaponIsRedHerring) message += "bloody " + weapon.getName().toLowerCase();
+                    if (!weaponIsRedHerring) message += "bloody " + weapon.getName().toLowerCase();
                     else message += weapon.getName().toLowerCase() + " with some red liquid on it";
                     if (!roomIsRedHerring) message += " and a ";
                     else message += " in the background";
@@ -76,13 +80,16 @@ public class CameraResult {
             message += ".";
         } else if (suspect == null) {
             if (!roomIsRedHerring) message += "a figure holding ";
-            if (weaponIsRedHerring) message += "a bloody " + weapon.getName().toLowerCase();
+            if (!weaponIsRedHerring) message += "a bloody " + weapon.getName().toLowerCase();
             else message += "a " + weapon.getName().toLowerCase() + " with some red liquid on it";
             message += " in the " + room.getName().toLowerCase() + ".";
         } else {
-            message += suspect.getName() + " holding ";
-            if (weaponIsRedHerring) message += "a bloody " + weapon.getName().toLowerCase();
-            else message += "a " + weapon.getName().toLowerCase() + " with some red liquid on it";
+            message += suspect.getName();
+            if (weapon != null) {
+                message += " holding ";
+                if (!weaponIsRedHerring) message += "a bloody " + weapon.getName().toLowerCase();
+                else message += "a " + weapon.getName().toLowerCase() + " with some red liquid on it";
+            }
             if (roomIsRedHerring) message += " sneaking across the back wall of the " + room.getName().toLowerCase();
             else message += " in the " + room.getName().toLowerCase();
             message += ".";
@@ -102,7 +109,7 @@ public class CameraResult {
         return room;
     }
 
-    boolean isRoomIsRedHerring() {
+    boolean isRoomRedHerring() {
         return roomIsRedHerring;
     }
 
@@ -110,7 +117,7 @@ public class CameraResult {
         return weapon;
     }
 
-    boolean isWeaponIsRedHerring() {
+    boolean isWeaponRedHerring() {
         return weaponIsRedHerring;
     }
 
@@ -118,7 +125,7 @@ public class CameraResult {
         return suspect;
     }
 
-    boolean isSuspectIsRedHerring() {
+    boolean isSuspectRedHerring() {
         return suspectIsRedHerring;
     }
 
@@ -126,10 +133,39 @@ public class CameraResult {
         return turnsForAnalysis;
     }
 
+    void setRoom(Room room) {
+        this.room = room;
+    }
+
+    void setRoomIsRedHerring(boolean roomIsRedHerring) {
+        this.roomIsRedHerring = roomIsRedHerring;
+    }
+
+    void setWeapon(Weapon weapon) {
+        this.weapon = weapon;
+    }
+
+    void setWeaponIsRedHerring(boolean weaponIsRedHerring) {
+        this.weaponIsRedHerring = weaponIsRedHerring;
+    }
+
+    void setSuspect(Suspect suspect) {
+        this.suspect = suspect;
+    }
+
+    void setSuspectIsRedHerring(boolean suspectIsRedHerring) {
+        this.suspectIsRedHerring = suspectIsRedHerring;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        return room == ((FingerprintSample) obj).getRoom() &&
-            suspect == ((FingerprintSample) obj).getSuspect() &&
-            weapon == ((FingerprintSample) obj).getWeapon();
+        if (!(obj instanceof CameraResult)) return false;
+        return room == ((CameraResult) obj).getRoom() &&
+            roomIsRedHerring == ((CameraResult) obj).isRoomRedHerring() &&
+            weapon == ((CameraResult) obj).getWeapon() &&
+            weaponIsRedHerring == ((CameraResult) obj).isWeaponRedHerring() &&
+            suspect == ((CameraResult) obj).getSuspect() &&
+            suspectIsRedHerring == ((CameraResult) obj).isSuspectRedHerring() &&
+            turnsForAnalysis == ((CameraResult) obj).getTurnsForAnalysis();
     }
 }

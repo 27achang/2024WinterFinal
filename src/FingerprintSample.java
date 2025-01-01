@@ -45,6 +45,7 @@ public class FingerprintSample {
 
     @Override
     public boolean equals(Object obj) {
+        if (!(obj instanceof FingerprintSample)) return false;
         return room == ((FingerprintSample) obj).getRoom() &&
             suspect == ((FingerprintSample) obj).getSuspect() &&
             weapon == ((FingerprintSample) obj).getWeapon() &&

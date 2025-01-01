@@ -39,6 +39,7 @@ public class DNASample {
 
     @Override
     public boolean equals(Object obj) {
+        if (!(obj instanceof DNASample)) return false;
         return room == ((DNASample) obj).getRoom() &&
             suspect == ((DNASample) obj).getSuspect() &&
             hasResult == ((DNASample) obj).hasResult();

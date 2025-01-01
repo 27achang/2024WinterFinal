@@ -234,7 +234,7 @@ public class Simulation {
 
             To return to the main menu, press enter.""");
         String answer;
-        do{
+        do {
             answer = input.nextLine();
         } while (!answer.equals(""));
 
@@ -530,7 +530,7 @@ public class Simulation {
                     if (inventory.contains(Item.DNA_COLLECTOR) && collectedDNASample == null) options.add(Command.COLLECT_DNA);
                     if (inventory.contains(Item.FINGERPRINT_COLLECTOR) && collectedFingerprintSample == null) options.add(Command.COLLECT_FINGERPRINTS);
                     if (inventory.contains(Item.UV_SCANNER)) options.add(Command.UV_SCAN);
-                    if(currentCell == '/' || currentCell == '\\') options.add(Command.PASS);
+                    if (currentCell == '/' || currentCell == '\\') options.add(Command.PASS);
                 }
             }
 
@@ -592,24 +592,16 @@ public class Simulation {
             // Process any other entry or exit from rooms
             else if (currentCell == '^' && action == Command.UP) {
                 yPos -= 2;
-                if(currentRoom != null) {
-                    currentRoom = null;
-                }
+                if (currentRoom != null) currentRoom = null;
             } else if (currentCell == 'v' && action == Command.DOWN) {
                 yPos += 2;
-                if(currentRoom != null) {
-                    currentRoom = null;
-                }
+                if (currentRoom != null) currentRoom = null;
             } else if (currentCell == '<' && action == Command.LEFT) {
                 xPos -= 2;
-                if(currentRoom != null) {
-                    currentRoom = null;
-                }
+                if (currentRoom != null) currentRoom = null;
             } else if (currentCell == '>' && action == Command.RIGHT) {
                 xPos += 2;
-                if(currentRoom != null) {
-                    currentRoom = null;
-                }
+                if (currentRoom != null) currentRoom = null;
             } else if (currentRoom == Room.STAIRCASE && action == Command.UP) {
                 yPos--;
                 currentRoom = null;
@@ -641,13 +633,17 @@ public class Simulation {
             }
 
             // If the user entered a room, update the currentRoom variable
-            try {
-                currentRoom = Arrays.stream(Room.values()).filter((a) -> Arrays.stream(a.getEntrances()).anyMatch((b) -> b[0] == xPos && b[1] == yPos)).findFirst().get();
-                if(!visitedRooms.contains(currentRoom)) visitedRooms.add(currentRoom);
-            } catch (NoSuchElementException e) {}
+            Optional<Room> enteredRoom = Arrays.stream(Room.values()).filter((a) -> Arrays.stream(a.getEntrances()).anyMatch((b) -> b[0] == xPos && b[1] == yPos)).findFirst();
+            if (enteredRoom.isPresent()) {
+                currentRoom = enteredRoom.get();
+                if (!visitedRooms.contains(currentRoom)) visitedRooms.add(currentRoom);
+                clearConsole();
+                rollingPrint("You have entered the " + enteredRoom.get().getName() + ".");
+                input.nextLine();
+            }
 
             // Increment the turns counters
-            if(action != Command.INVENTORY) {
+            if (action != Command.INVENTORY) {
                 actionableTurns++;
                 if (labDNASample != null && action != Command.SUBMIT_DNA) turnsSinceDNASubmitted++;
                 if (labFingerprintSample != null && action != Command.SUBMIT_FINGERPRINTS) turnsSinceFingerprintsSubmitted++;
@@ -768,7 +764,7 @@ public class Simulation {
 
     private void collectFingerprints() {
         loadingAnimation("Collecting",1);
-        if(currentRoom.hasWeapon()) {
+        if (currentRoom.hasWeapon()) {
             rollingPrint("You found a bloody " + currentRoom.getWeapon().getName().toLowerCase() + " with some fingerprints on it in the " + currentRoom.getName().toLowerCase() + "! ");
             textDelay();
             rollingPrint("Submit it to Detective Joseph at the central staircase for analysis.");
@@ -776,7 +772,7 @@ public class Simulation {
             collectedFingerprintSample = new FingerprintSample(currentRoom, currentRoom.getWeapon(), currentRoom.getWeaponFingerprints());
         }
         else{
-            if(Math.random() < 0.5) rollingPrint("You struggled to find any fingerprints in the " + currentRoom.getName().toLowerCase() + ".");
+            if (Math.random() < 0.5) rollingPrint("You struggled to find any fingerprints in the " + currentRoom.getName().toLowerCase() + ".");
             else rollingPrint("You found some weak fingerprints in the corner of the " + currentRoom.getName().toLowerCase() + " but struggled to collect them.");
         }
         input.nextLine();
@@ -784,12 +780,12 @@ public class Simulation {
 
     private void scanUV() {
         loadingAnimation("Scanning",1);
-        if(currentRoom.isUVCluePresent()) {
+        if (currentRoom.isUVCluePresent()) {
             rollingPrint("You found a some bloodspots on the wall of the " + currentRoom.getName().toLowerCase() + "!");
             totalUVScans++;
         }
         else{
-            if(Math.random() < 0.5) rollingPrint("You thought you saw something on the wall of the " + currentRoom.getName().toLowerCase() + ", but it turned out to be a fluke.");
+            if (Math.random() < 0.5) rollingPrint("You thought you saw something on the wall of the " + currentRoom.getName().toLowerCase() + ", but it turned out to be a fluke.");
             else rollingPrint("You didn't see a thing when you turned on your UV light in the " + currentRoom.getName().toLowerCase() + ".");
         }
         input.nextLine();
@@ -903,10 +899,10 @@ public class Simulation {
      * Place the 3 forensic items in random rooms
      */
     private void placeItems() {
-        for(Item item : Item.values()) {
+        for (Item item : Item.values()) {
             int random;
             Room room;
-            do{
+            do {
                 random = (int)(Math.random() * 10);
                 room = Room.values()[random];
             } while (room.hasItem());
@@ -1093,7 +1089,7 @@ public class Simulation {
             switch (map.charAt(i)) {
                 case 'X':
                     System.out.print((color.equals("white") ? ANSI_BLUE_BACKGROUND : ANSI_WHITE_BACKGROUND) + '\u00A0');
-                    if(i == map.length() - 1 || map.charAt(i + 1) != 'X') System.out.print(ANSI_RESET);
+                    if (i == map.length() - 1 || map.charAt(i + 1) != 'X') System.out.print(ANSI_RESET);
                     break;
                 
                 case '1':
@@ -1163,7 +1159,7 @@ public class Simulation {
                             (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
             );
             acceptedCommands.add(command.getName());
-            if(command.containsAliases()) Arrays.stream(command.getAliases()).forEach((alias) -> acceptedCommands.add(alias));
+            if (command.containsAliases()) Arrays.stream(command.getAliases()).forEach((alias) -> acceptedCommands.add(alias));
         }
         
         // Allow the user to provide input
@@ -1180,7 +1176,7 @@ public class Simulation {
             rollingPrintln(message);
 
             // Print the command options
-            for(Command command : commands) {
+            for (Command command : commands) {
                 if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
                                 (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
                 );
@@ -1221,7 +1217,7 @@ public class Simulation {
                             (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
             );
             acceptedCommands.add(command.getName());
-            if(command.containsAliases()) Arrays.stream(command.getAliases()).forEach((alias) -> acceptedCommands.add(alias));
+            if (command.containsAliases()) Arrays.stream(command.getAliases()).forEach((alias) -> acceptedCommands.add(alias));
         }
         
         // Allow the user to provide input
@@ -1238,7 +1234,7 @@ public class Simulation {
             rollingPrintln(message);
 
             // Print the command options
-            for(Command command : commands) {
+            for (Command command : commands) {
                 if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
                             (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
                 );
@@ -1281,7 +1277,7 @@ public class Simulation {
                             (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
             );
             acceptedCommands.add(command.getName());
-            if(command.containsAliases()) Arrays.stream(command.getAliases()).forEach((alias) -> acceptedCommands.add(alias));
+            if (command.containsAliases()) Arrays.stream(command.getAliases()).forEach((alias) -> acceptedCommands.add(alias));
         }
         
         // Allow the user to provide input
@@ -1300,7 +1296,7 @@ public class Simulation {
             rollingPrintln(message);
 
             // Print the command options
-            for(Command command : commands) {
+            for (Command command : commands) {
                 if (rolling) rollingPrintln(ANSI_BLUE_BACKGROUND + ANSI_BLACK + " " + command.getName() + " " + ANSI_RESET + " - " + command.getDescription() +
                             (command.getAliases().length > 0 ? " (Alias" + (command.getAliases().length > 1 ? "es" : "") + ": " + Arrays.stream(command.getAliases()).limit(command.getAliases().length - 1).collect(Collectors.joining(", ")) + (command.getAliases().length == 1 ? "" : (command.getAliases().length == 2 ? "" : ",") + " and ") + command.getAliases()[command.getAliases().length - 1] + ")" : "")
                 );
@@ -1546,7 +1542,7 @@ public class Simulation {
         if (cycles <= 0) throw new IllegalArgumentException("Illegal number of loading animation cycles");
         clearConsole();
         for (int i = 0; i < cycles; i++) {
-            for(int j = 0; j < 5; j++) {
+            for (int j = 0; j < 5; j++) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -1580,7 +1576,7 @@ public class Simulation {
         clearConsole();
         for (int i = 0; i < cycles; i++) {
             System.out.print(prefix);
-            for(int j = 0; j < 5; j++) {
+            for (int j = 0; j < 5; j++) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -1605,7 +1601,7 @@ public class Simulation {
     public static void rollingPrint(Object obj) {
         try {
             String output = obj.toString();
-            for(int i = 0; i < output.length() - 1; i++) {
+            for (int i = 0; i < output.length() - 1; i++) {
                 System.out.print(output.charAt(i));
                 Thread.sleep(15);
             }
