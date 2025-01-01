@@ -6,11 +6,11 @@
  */
 public class CameraResult {
     private Room room;
-    private boolean roomIsRedHerring;
+    private boolean roomIsRedHerring = true;
     private Weapon weapon;
-    private boolean weaponIsRedHerring;
+    private boolean weaponIsRedHerring = true;
     private Suspect suspect;
-    private boolean suspectIsRedHerring;
+    private boolean suspectIsRedHerring = true;
     private final int turnsForAnalysis = (int)(Math.random() * 3) + 8;
 
     CameraResult(Room answerRoom, Weapon answerWeapon, Suspect answerSuspect) {
@@ -21,7 +21,7 @@ public class CameraResult {
             if (random > 0.8) {
                 roomIsRedHerring = true;
                 // Select a random room that is not the answerRoom
-                do{
+                do {
                     room = Room.values()[(int)(Math.random() * 10)];
                 } while (room == answerRoom);
             } else room = answerRoom;
@@ -34,7 +34,7 @@ public class CameraResult {
             } else if (random > 0.9) {
                 weaponIsRedHerring = true;
                 // Select a random weapon that is not the answerWeapon
-                do{
+                do {
                     weapon = Weapon.values()[(int)(Math.random() * 7)];
                 } while (weapon == answerWeapon);
             }
@@ -47,7 +47,7 @@ public class CameraResult {
             } else if (random > 0.9) {
                 suspectIsRedHerring = true;
                 // Select a random suspect that is not the answerSuspect
-                do{
+                do {
                     suspect = Suspect.values()[(int)(Math.random() * 7)];
                 } while (suspect == answerSuspect);
             }
@@ -55,23 +55,47 @@ public class CameraResult {
     }
 
     String generateMessage() {
-        // Implementation not complete
-        String message = "The footage that you requested of the ";
-        /*
-            rollingPrint("The footage that you requested of the " + roomOfRequestedCameras.getName().toLowerCase() + " on the night of the murder showed ");
-            if (suspectOfRequestedCameras != null) {
-                rollingPrintln(suspectOfRequestedCameras.getName());
-                double random = Math.random();
-                if (random < 0.2) rollingPrint(" sulking around.");
-                else if (random < 0.4) rollingPrint(" acting suspicious.");
-                else if (random < 0.6) rollingPrint(" barely at the edge of the frame.");
-                else if (random < 0.8) rollingPrint(" sneaking across the opposite wall.");
-                else if (random < 1) rollingPrint(" hunched over something.");
-            } else {
-                rollingPrintln("no activity.");
+        String message = "The footage that you requested from the night of the murder showed ";
+        if (room == null) return message + "no activity.";
+        if (roomIsRedHerring && weapon == null && suspect == null) return message + "some activity in the " + room.getName().toLowerCase() + ".";
+        if (!roomIsRedHerring && !weaponIsRedHerring && !suspectIsRedHerring) return message + (suspect != null ? suspect.getName() : "a figure") + " killing Thompson " + (weapon != null ? "with a " + weapon.getName().toLowerCase() + " " : "") + "in the " + room.getName() + ".";
+        else if (suspectIsRedHerring) {
+            message += suspect.getName() + " passing through the " + room.getName().toLowerCase();
+            if (weapon != null || !roomIsRedHerring) {
+                message += " with a ";
+                if (weapon != null) {
+                    if (weaponIsRedHerring) message += "bloody " + weapon.getName().toLowerCase();
+                    else message += weapon.getName().toLowerCase() + " with some red liquid on it";
+                    if (!roomIsRedHerring) message += " and a ";
+                    else message += " in the background";
+                }
+                if (!roomIsRedHerring) {
+                    message += "dead body in the background";
+                }
             }
-         */
+            message += ".";
+        } else if (suspect == null) {
+            if (!roomIsRedHerring) message += "a figure holding ";
+            if (weaponIsRedHerring) message += "a bloody " + weapon.getName().toLowerCase();
+            else message += "a " + weapon.getName().toLowerCase() + " with some red liquid on it";
+            message += " in the " + room.getName().toLowerCase() + ".";
+        } else {
+            message += suspect.getName() + " holding ";
+            if (weaponIsRedHerring) message += "a bloody " + weapon.getName().toLowerCase();
+            else message += "a " + weapon.getName().toLowerCase() + " with some red liquid on it";
+            if (roomIsRedHerring) message += " sneaking across the back wall of the " + room.getName().toLowerCase();
+            else message += " in the " + room.getName().toLowerCase();
+            message += ".";
+        }
         return message;
+        /*
+         * Alternate messages:
+         *  sulking around
+         *  acting suspicious
+         *  barely at the edge of the frame
+         *  sneaking across the opposite wall
+         *  hunched over something
+         */
     }
 
     Room getRoom() {

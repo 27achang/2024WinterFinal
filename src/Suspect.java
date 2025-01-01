@@ -5,21 +5,27 @@
  * @version 1.01, 12/29/2024
  */
 public enum Suspect {
-    SCARLET("Miss Scarlet"),
-    MUSTARD("Colonel Mustard"),
-    WHITE("Mrs. White"),
-    GREEN("Reverend Green"),
-    PEACOCK("Mrs. Peacock"),
-    PLUM("Professor Plum");
+    SCARLETT("Miss Scarlett", "her"),
+    MUSTARD("Colonel Mustard", "his"),
+    WHITE("Mrs. White", "her"),
+    GREEN("Reverend Green", "his"),
+    PEACOCK("Mrs. Peacock", "her"),
+    PLUM("Professor Plum", "his");
 
     private String name;
+    private String possessivePronoun;
 
-    Suspect(String name) {
+    Suspect(String name, String possessivePronoun) {
         this.name = name;
+        this.possessivePronoun = possessivePronoun;
     }
 
     String getName() {
         return name;
+    }
+
+    String getPossessivePronoun() {
+        return possessivePronoun;
     }
 
     @Override
