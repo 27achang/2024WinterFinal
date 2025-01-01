@@ -2,7 +2,7 @@
  * The CameraResult class encapsulates functionality for surveillance camera clips requested by the user
  * 
  * @author Alexander Chang
- * @version 1.02, 12/30/2024
+ * @version 1.03, 12/31/2024
  */
 public class CameraResult {
     private Room room;
