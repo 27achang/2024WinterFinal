@@ -638,7 +638,7 @@ public class Simulation {
                 if (!visitedRooms.contains(currentRoom)) visitedRooms.add(currentRoom);
                 if (currentRoom == null) {
                     clearConsole();
-                    rollingPrint("You have entered the " + enteredRoom.get().getName() + ".");
+                    rollingPrint("You have entered the " + enteredRoom.get().getName().toLowerCase() + ".");
                     input.nextLine();
                 }
                 currentRoom = enteredRoom.get();
@@ -1132,6 +1132,8 @@ public class Simulation {
         rollingPrintln("===== Your Inventory =====");
         if (numDonuts > 0) rollingPrintln(numDonuts + " donut" + (numDonuts > 1 ? "s" : ""));
         inventory.forEach((a) -> rollingPrintln(a.getName() + " - " + a.getDescription()));
+        if (collectedFingerprintSample != null) rollingPrintln("A fingerprint sample off a " + collectedFingerprintSample.getWeapon().getName().toLowerCase() + " from the " + collectedFingerprintSample.getRoom().getName().toLowerCase() + " - Submit to Detective Joseph at the central staircase for analysis.");
+        if (collectedDNASample != null) rollingPrintln("A DNA sample from the " + collectedDNASample.getRoom().getName().toLowerCase() + " - Submit to Detective Joseph at the central staircase for analysis.");
         System.out.println();
         rollingPrint("To return to the map, press enter.");
         input.nextLine();
