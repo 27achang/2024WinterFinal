@@ -22,6 +22,8 @@ public enum Command {
     COLLECT_DNA("collectdna", "Collect DNA from the room you are currently in"),
     COLLECT_FINGERPRINTS("collectfingerprints", "Collect fingerprints from the room you are currently in", "fingerprint"),
     UV_SCAN("uvscan","Use a UV light to scan the room you are currently in for hidden clues"),
+    DISCARD_DNA("discarddna", "Discard the DNA sample you collected"),
+    DISCARD_FINGERPRINTS("discardfingerprints", "Discard the fingerprint sample you collected"),
     SUBMIT_DNA("submitdna", "Submit DNA to Detective Joseph to send to the lab for analysis"),
     SUBMIT_FINGERPRINTS("submitfingerprints", "Submit fingerprints to Detective Joseph to send to the lab for analysis"),
     REQUEST_CAMERAS("requestcameras", "Request security camera footage from the night of the murder"),

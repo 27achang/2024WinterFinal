@@ -536,6 +536,10 @@ public class Simulation {
 
             // Determine if the inventory can be opened
             if (inventory.size() > 0 || numDonuts > 0) options.add(Command.INVENTORY);
+            // Determine if a DNA sample can be discarded
+            if (collectedDNASample != null) options.add(Command.DISCARD_DNA);
+            // Determine if a fingerprint sample can be discarded
+            if (collectedFingerprintSample != null) options.add(Command.DISCARD_FINGERPRINTS);
 
             // Prompt the user to choose from the available options
             Command action = promptInputWithMap("So, detective, what do you want to do?", false, options);
@@ -617,6 +621,8 @@ public class Simulation {
                 case Command.COLLECT_DNA -> collectDNA();
                 case Command.COLLECT_FINGERPRINTS -> collectFingerprints();
                 case Command.UV_SCAN -> scanUV();
+                case Command.DISCARD_DNA -> discardDNA();
+                case Command.DISCARD_FINGERPRINTS -> discardFingerprints();
                 case Command.SUBMIT_DNA -> submitDNA();
                 case Command.SUBMIT_FINGERPRINTS -> submitFingerprints();
                 case Command.REQUEST_CAMERAS -> requestCamera();
@@ -645,7 +651,7 @@ public class Simulation {
             }
 
             // Increment the turns counters
-            if (action != Command.INVENTORY) {
+            if ((action == Command.DISCARD_DNA && collectedDNASample == null) || (action == Command.DISCARD_FINGERPRINTS && collectedFingerprintSample == null) || action != Command.INVENTORY) {
                 actionableTurns++;
                 if (labDNASample != null && action != Command.SUBMIT_DNA) turnsSinceDNASubmitted++;
                 if (labFingerprintSample != null && action != Command.SUBMIT_FINGERPRINTS) turnsSinceFingerprintsSubmitted++;
@@ -790,6 +796,22 @@ public class Simulation {
             if (Math.random() < 0.5) rollingPrint("You thought you saw something on the wall of the " + currentRoom.getName().toLowerCase() + ", but it turned out to be a fluke.");
             else rollingPrint("You didn't see a thing when you turned on your UV light in the " + currentRoom.getName().toLowerCase() + ".");
         }
+        input.nextLine();
+    }
+
+    private void discardDNA() {
+        clearConsole();
+        if (promptYesNo("Are you sure you want to discard the DNA sample you collected in the " + collectedDNASample.getRoom().getName().toLowerCase(), true) == Command.NO) return;
+        collectedDNASample = null;
+        rollingPrint("You have discarded the DNA sample you collected in the " + collectedDNASample.getRoom().getName().toLowerCase());
+        input.nextLine();
+    }
+
+    private void discardFingerprints() {
+        clearConsole();
+        if (promptYesNo("Are you sure you want to discard the fingerprint sample you collected in the " + collectedFingerprintSample.getRoom().getName().toLowerCase(), true) == Command.NO) return;
+        collectedFingerprintSample = null;
+        rollingPrint("You have discarded the DNA sample you collected in the " + collectedFingerprintSample.getRoom().getName().toLowerCase());
         input.nextLine();
     }
 
