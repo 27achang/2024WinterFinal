@@ -3,10 +3,44 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * The Simulation class contains the core mechanics of the game including turn actions and prompting for input
+ * The {@code Simulation} class contains the core mechanics of the game including turn actions and prompting for input
+ * <p>
+ * <strong>Changelog</strong>
+ * <p>
+ * Version 1.4 (1/2/2024):
+ * <ul>
+ * <li>
+ * <strong>Additions:</strong>
+ * <ul>
+ * <li><strong>Added detective's log</strong></li>
+ * <li>Added evidence samples to inventory</li>
+ * <li>Added ability to discard collected evidence samples</li>
+ * </ul>
+ * </li>
+ * <li>
+ * <strong>Bug fixes:</strong>
+ * <ul>
+ * <li>Fixed unnecessary capitalization of room when user entered a room</li>
+ * <li>Fixed recurring message of entering a room when standing on an entrance cell</li>
+ * <li>Fixed name validation</li>
+ * <li>Removed extra line from about page</li>
+ * </ul>
+ * </li>
+ * </ul>
+ * <p>
+ * Version 1.3 (1/1/2025):
+ * <ul>
+ * <li>
+ * <strong>Overhauled camera system</strong>
+ * <ul>
+ * <li>Cameras now have a chance to show all three aspects of the crime (suspect, weapon, room), including a chance for red herrings</li>
+ * </ul>
+ * </li>
+ * </ul>
  * 
  * @author Alexander Chang
- * @version 1.02, 12/30/2024
+ * @version 1.4, 1/2/2025
+ * @since 1.0
  */
 public class Simulation {
     // ANSI COLOR CODES
@@ -102,6 +136,7 @@ public class Simulation {
     private String character;
     private String playerANSIColor;
     private ArrayList<Item> inventory = new ArrayList<>();
+    private String detectivesLog;
     private Room currentRoom;
     private ArrayList<Room> visitedRooms = new ArrayList<>();
     private int numDonuts;
@@ -377,9 +412,9 @@ public class Simulation {
         textDelay();
         rollingPrint("If at any point you need to reach me or can't manage the investigation any longer for whatever reason, I'll be right at the base of the central staircase with the media. ");
         textDelay();
-        rollingPrint("It'd be to your advantage to take notes on the clues you find and remember, ");
+        rollingPrint("I'll keep track of any analysis you complete or cameras you request in your detective's log and remember, ");
         textDelay(250);
-        rollingPrint(ANSI_WHITE_BACKGROUND + ANSI_BLACK + ANSI_BOLD + " time is of the essence. " + ANSI_RESET);
+        rollingPrint(ANSI_WHITE_BACKGROUND + ANSI_BOLD + ANSI_BLUE + " time is of the essence. " + ANSI_RESET);
         textDelay();
         System.out.println();
         System.out.println();
@@ -445,7 +480,7 @@ public class Simulation {
                 break;
         }
 
-        // Begins the actual text adventure
+        // Begin the actual text adventure
         run();
     }
 
@@ -459,9 +494,15 @@ public class Simulation {
 
             // Deliver lab and camera results
             if (labDNASample != null && turnsSinceDNASubmitted == labDNASample.getTurnsForAnalysis()) {
+                // Deliver the results
                 System.out.println("===== Lab Results =====");
                 rollingPrintln("The DNA you collected from the " + labDNASample.getRoom().getName().toLowerCase() + (labDNASample.hasResult() ? " was identified as that of " + labDNASample.getSuspect().getName() + "." : " could not be identified."));
                 System.out.println("=======================");
+
+                // Add the results to the detective's log
+                detectivesLog += "DNA sample from " + labDNASample.getRoom().getName().toLowerCase() + (labDNASample.hasResult() ? " was identified as that of " + labDNASample.getSuspect().getName() : " was inconclusive") + ".\n";
+
+                // Require result acknowledgement
                 String answer;
                 do {
                     System.out.println();
@@ -469,12 +510,20 @@ public class Simulation {
                     System.out.print("> ");
                     answer = input.nextLine();
                 } while (!answer.toLowerCase().equals("ok"));
+
+                // Reset DNA sample and clear console
                 labDNASample = null;
                 clearConsole();
             } else if (labFingerprintSample != null && turnsSinceFingerprintsSubmitted == labFingerprintSample.getTurnsForAnalysis()) {
+                // Deliver the results
                 System.out.println("===== Lab Results =====");
                 rollingPrintln("The fingerprints you collected from the " + labFingerprintSample.getWeapon().getName().toLowerCase() + " in the " + labFingerprintSample.getRoom().getName().toLowerCase() + " were identified as those of " + labFingerprintSample.getSuspect().getName() + ".");
                 System.out.println("=======================");
+
+                // Add the results to the detective's log
+                detectivesLog += "Fingerprints off a " + labFingerprintSample.getWeapon().getName().toLowerCase() + " from " + labFingerprintSample.getRoom().getName().toLowerCase() + " were identified as that of " + labFingerprintSample.getSuspect().getName() + ".\n";
+
+                // Require result acknowledgement
                 String answer;
                 do {
                     System.out.println();
@@ -482,12 +531,20 @@ public class Simulation {
                     System.out.print("> ");
                     answer = input.nextLine();
                 } while (!answer.toLowerCase().equals("ok"));
+
+                // Reset fingerprint sample and clear console
                 labFingerprintSample = null;
                 clearConsole();
             } else if (requestedCameras != null && turnsSinceCamerasRequested == requestedCameras.getTurnsForAnalysis()) {
+                // Deliver the results
                 System.out.println("===== Camera Results =====");
                 rollingPrintln(requestedCameras.generateMessage());
                 System.out.println("==========================");
+
+                // Add the results to the detective's log
+                detectivesLog += requestedCameras.generateLogMessage();
+
+                // Require result acknowledgement
                 String answer;
                 do {
                     System.out.println();
@@ -495,6 +552,8 @@ public class Simulation {
                     System.out.print("> ");
                     answer = input.nextLine();
                 } while (!answer.toLowerCase().equals("ok"));
+
+                // Reset requested cameras and clear console
                 requestedCameras = null;
                 clearConsole();
             }
@@ -536,6 +595,8 @@ public class Simulation {
 
             // Determine if the inventory can be opened
             if (inventory.size() > 0 || numDonuts > 0) options.add(Command.INVENTORY);
+            // Determine if the detective's log can be opened
+            if (detectivesLog.length() > 0) options.add(Command.LOG);
             // Determine if a DNA sample can be discarded
             if (collectedDNASample != null) options.add(Command.DISCARD_DNA);
             // Determine if a fingerprint sample can be discarded
@@ -617,6 +678,7 @@ public class Simulation {
                 case Command.LEFT -> xPos--;
                 case Command.RIGHT -> xPos++;
                 case Command.INVENTORY -> openInventory();
+                case Command.LOG -> openDetectivesLog();
                 case Command.SEARCH -> searchRoom();
                 case Command.COLLECT_DNA -> collectDNA();
                 case Command.COLLECT_FINGERPRINTS -> collectFingerprints();
@@ -728,7 +790,7 @@ public class Simulation {
     }
 
     private void searchRoom() {
-        loadingAnimation("Searching",1);
+        loadingAnimation("Searching", 1);
         totalRoomSearches++;
         double random = Math.random();
         if (currentRoom.hasItem() && !(inventory.contains(currentRoom.getItem()))) {
@@ -758,7 +820,7 @@ public class Simulation {
     }
 
     private void collectDNA() {
-        loadingAnimation("Collecting",1);
+        loadingAnimation("Collecting", 1);
         // 30% chance you can still find DNA if it is not relevant to the case
         if (currentRoom.getDNA() != null || Math.random() < 0.3) {
             rollingPrint("You've collected DNA from the " + currentRoom.getName().toLowerCase() + ". ");
@@ -771,7 +833,7 @@ public class Simulation {
     }
 
     private void collectFingerprints() {
-        loadingAnimation("Collecting",1);
+        loadingAnimation("Collecting", 1);
         if (currentRoom.hasWeapon()) {
             rollingPrint("You found a bloody " + currentRoom.getWeapon().getName().toLowerCase() + " with some fingerprints on it in the " + currentRoom.getName().toLowerCase() + "! ");
             textDelay();
@@ -787,7 +849,7 @@ public class Simulation {
     }
 
     private void scanUV() {
-        loadingAnimation("Scanning",1);
+        loadingAnimation("Scanning", 1);
         if (currentRoom.isUVCluePresent()) {
             rollingPrint("You found a some bloodspots on the wall of the " + currentRoom.getName().toLowerCase() + "!");
             totalUVScans++;
@@ -1146,7 +1208,7 @@ public class Simulation {
     }
 
     /**
-     * Opens the player's inventory
+     * Opens the user's inventory
      */
     private void openInventory() {
         clearConsole();
@@ -1156,6 +1218,18 @@ public class Simulation {
         inventory.forEach((a) -> rollingPrintln(a.getName() + " - " + a.getDescription()));
         if (collectedFingerprintSample != null) rollingPrintln("A fingerprint sample off a " + collectedFingerprintSample.getWeapon().getName().toLowerCase() + " from the " + collectedFingerprintSample.getRoom().getName().toLowerCase() + " - Submit to Detective Joseph at the central staircase for analysis.");
         if (collectedDNASample != null) rollingPrintln("A DNA sample from the " + collectedDNASample.getRoom().getName().toLowerCase() + " - Submit to Detective Joseph at the central staircase for analysis.");
+        System.out.println();
+        rollingPrint("To return to the map, press enter.");
+        input.nextLine();
+    }
+
+    /**
+     * Opens the player's detective's log
+     */
+    private void openDetectivesLog() {
+        clearConsole();
+        System.out.println("===== Detective's Log =====");
+        System.out.print(detectivesLog);
         System.out.println();
         rollingPrint("To return to the map, press enter.");
         input.nextLine();

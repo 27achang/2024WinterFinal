@@ -2,8 +2,11 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
+ * The {@code CameraResultTest} class provides tests for all 18 possible outcomes of security camera footage requested by the user
+ * 
  * @author Alexander Chang
- * @version 1.2, 11/14/2024
+ * @version 1.3, 12/31/2024
+ * @since 1.3
  */
 public class CameraResultTest {
     private final String message = "The footage that you requested from the night of the murder showed ";

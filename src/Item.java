@@ -1,8 +1,9 @@
 /**
- * The Item enum type contains functionality for game items
+ * The {@code Item} enum type contains functionality for game items
  * 
  * @author Alexander Chang
- * @version 1.01, 12/29/2024
+ * @version 1.1, 12/29/2024
+ * @since 1.0
  */
 public enum Item {
     FINGERPRINT_COLLECTOR("Fingerprint Collector", "Collect fingerprints from various surfaces. Analyze these with Detective Joseph."),

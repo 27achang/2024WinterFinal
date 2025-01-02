@@ -1,35 +1,14 @@
 /**
- * The DNASample class encapsulates functionality for DNA samples collected by the user
+ * The {@code DNASample} class encapsulates functionality for DNA samples collected by the user
  * 
  * @author Alexander Chang
- * @version 1.02, 12/30/2024
+ * @version 1.4, 1/2/2025
+ * @since 1.1
  */
-public class DNASample {
-    private Room room;
-    private Suspect suspect;
-    private boolean hasResult;
-    private final int turnsForAnalysis = (int)(Math.random() * 6) + 5;
+public class DNASample extends EvidenceSample {
 
     DNASample(Room room, Suspect suspect) {
-        this.room = room;
-        this.suspect = suspect;
-        hasResult = suspect != null;
-    }
-
-    Room getRoom() {
-        return room;
-    }
-
-    Suspect getSuspect() {
-        return suspect;
-    }
-
-    boolean hasResult() {
-        return hasResult;
-    }
-
-    int getTurnsForAnalysis() {
-        return turnsForAnalysis;
+        super(room, suspect);
     }
 
     @Override

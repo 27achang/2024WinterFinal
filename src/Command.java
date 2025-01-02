@@ -1,11 +1,12 @@
 import java.util.Arrays;
 
 /**
- * The Command enum type contains all accepted user commands and their aliases.
+ * The {@code Command} enum type contains all accepted user commands and their aliases.
  * The enum type also contains simple processing functions for game commands
  * 
  * @author Alexander Chang
- * @version 1.01, 12/29/2024
+ * @version 1.4, 1/2/2025
+ * @since 1.0
  */
 public enum Command {
     ABOUT("about", "Learn more about Clue 2.0"),
@@ -18,6 +19,7 @@ public enum Command {
     RIGHT("right", "Move rightwards", "d"),
     PASS("pass", "Pass through the secret pathway to the room at the opposite corner of the mansion."),
     INVENTORY("inventory", "Open your inventory", "inv"),
+    LOG("log", "Open your detective's log"),
     SEARCH("search", "Search around the room you are currently in"),
     COLLECT_DNA("collectdna", "Collect DNA from the room you are currently in"),
     COLLECT_FINGERPRINTS("collectfingerprints", "Collect fingerprints from the room you are currently in", "fingerprint"),

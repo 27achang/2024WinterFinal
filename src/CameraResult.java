@@ -1,8 +1,9 @@
 /**
- * The CameraResult class encapsulates functionality for surveillance camera clips requested by the user
+ * The {@code CameraResult} class encapsulates functionality for surveillance camera clips requested by the user
  * 
  * @author Alexander Chang
- * @version 1.03, 12/31/2024
+ * @version 1.3, 1/1/2025
+ * @since 1.2
  */
 public class CameraResult {
     private Room room;
@@ -55,8 +56,10 @@ public class CameraResult {
     }
 
     String generateMessage() {
-        String message = "The footage that you requested from the night of the murder showed ";
+        return generateMessage("The footage that you requested from the night of the murder showed ");
+    }
 
+    String generateMessage(String message) {
         // Edge cases
         if (room == null) return message + "no activity.";
         if (roomIsRedHerring && weapon == null && suspect == null) return message + "some activity in the " + room.getName().toLowerCase() + ".";
@@ -103,6 +106,10 @@ public class CameraResult {
          *  sneaking across the opposite wall
          *  hunched over something
          */
+    }
+
+    String generateLogMessage() {
+        return generateMessage("Cameras showed ") + "\n";
     }
 
     Room getRoom() {
