@@ -230,7 +230,7 @@ public class Simulation {
         );
 
         // Provide instructions to return to the main menu
-        rollingPrintln("""
+        rollingPrint("""
 
             To return to the main menu, press enter.""");
         String answer;
@@ -303,7 +303,7 @@ public class Simulation {
             // Provide an error message
             rollingPrint("Are you sure that's a real name? ");
             textDelay();
-            rollingPrintln("It seems too \" + (answer.length() > 25 ? \"long.\" : \"short.\")");
+            rollingPrintln("It seems too " + (answer.length() > 25 ? "long." : "short."));
 
             // Prompt the user for a new name
             System.out.print("> ");
@@ -635,11 +635,13 @@ public class Simulation {
             // If the user entered a room, update the currentRoom variable
             Optional<Room> enteredRoom = Arrays.stream(Room.values()).filter((a) -> Arrays.stream(a.getEntrances()).anyMatch((b) -> b[0] == xPos && b[1] == yPos)).findFirst();
             if (enteredRoom.isPresent()) {
-                currentRoom = enteredRoom.get();
                 if (!visitedRooms.contains(currentRoom)) visitedRooms.add(currentRoom);
-                clearConsole();
-                rollingPrint("You have entered the " + enteredRoom.get().getName() + ".");
-                input.nextLine();
+                if (currentRoom == null) {
+                    clearConsole();
+                    rollingPrint("You have entered the " + enteredRoom.get().getName() + ".");
+                    input.nextLine();
+                }
+                currentRoom = enteredRoom.get();
             }
 
             // Increment the turns counters
