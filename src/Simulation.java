@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
  * <p>
  * <strong>Changelog</strong>
  * <p>
+ * Version 1.4.1 (1/2/2025) Closed {@code Scanner} object used for input
+ * <p>
  * Version 1.4 (1/2/2024):
  * <ul>
  * <li>
@@ -39,7 +41,7 @@ import java.util.stream.Collectors;
  * </ul>
  * 
  * @author Alexander Chang
- * @version 1.4, 1/2/2025
+ * @version 1.4.1, 1/2/2025
  * @since 1.0
  */
 public class Simulation {
@@ -317,6 +319,7 @@ public class Simulation {
             textDelay();
             rollingPrint("Farewell for now.");
             textDelay();
+            input.close();
             return;
         }
 
@@ -787,6 +790,7 @@ public class Simulation {
         rollingPrintln("               Total UV scans completed: " + totalUVScans);
         rollingPrintln("      Total pieces of footage requested: " + totalCamerasRequested);
         rollingPrintln(" Total donuts eaten by detective Joseph: " + totalDonutsEatenByJoseph);
+        input.close();
     }
 
     private void searchRoom() {
