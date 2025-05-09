@@ -138,7 +138,7 @@ public class Simulation {
     private String character;
     private String playerANSIColor;
     private ArrayList<Item> inventory = new ArrayList<>();
-    private String detectivesLog;
+    private String detectivesLog = "";
     private Room currentRoom;
     private ArrayList<Room> visitedRooms = new ArrayList<>();
     private int numDonuts;
@@ -778,7 +778,7 @@ public class Simulation {
         System.out.println();
         System.out.println();
         rollingPrintln(" Final inventory: " + inventory.stream().map(Item::getName).collect(Collectors.joining(", ")));
-        rollingPrintln("   Rooms visited: " + visitedRooms.stream().map(Room::getName).filter((a) -> !a.equals("Staircase")).collect(Collectors.joining(", ")));
+        rollingPrintln("   Rooms visited: " + visitedRooms.stream().map(Room::getName).filter((a) -> !(a.equals("Staircase"))).collect(Collectors.joining(", ")));
         System.out.println("-------------------------------------------" + (turns >= 10 ? "-" : "") + (turns >= 100 ? "-" : ""));
         rollingPrintln("                            Turns taken: " + turns);
         rollingPrintln("                     Total donuts found: " + totalDonutsFound);
