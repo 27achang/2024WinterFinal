@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
  * <p>
  * <strong>Changelog</strong>
  * <p>
+ * Version 1.4.2 (5/13/2025) Fixed various bugs
+ * <p>
  * Version 1.4.1 (1/2/2025) Closed {@code Scanner} object used for input
  * <p>
  * Version 1.4 (1/2/2024):
@@ -41,7 +43,7 @@ import java.util.stream.Collectors;
  * </ul>
  * 
  * @author Alexander Chang
- * @version 1.4.1, 1/2/2025
+ * @version 1.4.2, 5/13/2025
  * @since 1.0
  */
 public class Simulation {
@@ -867,17 +869,19 @@ public class Simulation {
 
     private void discardDNA() {
         clearConsole();
-        if (promptYesNo("Are you sure you want to discard the DNA sample you collected in the " + collectedDNASample.getRoom().getName().toLowerCase(), true) == Command.NO) return;
+        String room = collectedDNASample.getRoom().getName().toLowerCase();
+        if (promptYesNo("Are you sure you want to discard the DNA sample you collected in the " + room + "?", true) == Command.NO) return;
         collectedDNASample = null;
-        rollingPrint("You have discarded the DNA sample you collected in the " + collectedDNASample.getRoom().getName().toLowerCase());
+        rollingPrint("You have discarded the DNA sample you collected in the " + room + ".");
         input.nextLine();
     }
 
     private void discardFingerprints() {
         clearConsole();
-        if (promptYesNo("Are you sure you want to discard the fingerprint sample you collected in the " + collectedFingerprintSample.getRoom().getName().toLowerCase(), true) == Command.NO) return;
+        String room = collectedFingerprintSample.getRoom().getName().toLowerCase();
+        if (promptYesNo("Are you sure you want to discard the fingerprint sample you collected in the " + room + "?", true) == Command.NO) return;
         collectedFingerprintSample = null;
-        rollingPrint("You have discarded the DNA sample you collected in the " + collectedFingerprintSample.getRoom().getName().toLowerCase());
+        rollingPrint("You have discarded the DNA sample you collected in the " + room + ".");
         input.nextLine();
     }
 
