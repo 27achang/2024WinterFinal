@@ -436,6 +436,8 @@ public class Simulation {
         rollingPrintln(" Don't rush through. Keep an eye out for your lab results.");
         rollingPrintln(" Analyze samples you collect with Detective Joseph. Not everything is free. What would a cop want?");
         rollingPrintln(" Keep track of the clues you have collected. There is no way to go back.");
+        rollingPrintln(" Your position on the board is indicated by a square of your chosen color and its letter.");
+        rollingPrintln(" Enter rooms, marked in grey through the squares with arrows in them.");
         System.out.println("===================================================================================================");
 
         textDelay();        
